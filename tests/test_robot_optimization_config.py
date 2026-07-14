@@ -99,6 +99,9 @@ class RobotOptimizationConfigTest(unittest.TestCase):
         self.assertEqual(1.0, global_costmap["publish_frequency"])
 
         self.assertLessEqual(amcl["max_particles"], 1000)
+        self.assertEqual(2.0, amcl["initial_pose_x"])
+        self.assertEqual(8.05, amcl["initial_pose_y"])
+        self.assertEqual(1.5708, amcl["initial_pose_a"])
         self.assertLessEqual(gmapping["particles"], 30)
         self.assertEqual(0.25, costmap_common["robot_radius"])
         self.assertEqual(0.0, costmap_common["footprint_padding"])

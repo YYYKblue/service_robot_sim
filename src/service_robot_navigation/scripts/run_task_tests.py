@@ -190,6 +190,47 @@ class TaskTestRunner:
             publisher.publish(msg)
             self.rospy.sleep(0.2)
 
+        xy_tolerance = float(self.config.get("defaults", {}).get("xy_tolerance") or 0.25)
+        yaw_tolerance = float(self.config.get("defaults", {}).get("yaw_tolerance") or 0.25)
+        settle_timeout = float(self.config.get("defaults", {}).get("amcl_settle_timeout") or 5.0)
+        self.wait_for_amcl_pose(initial_pose, xy_tolerance, yaw_tolerance, settle_timeout)
+
+    def wait_for_amcl_pose(self, target_pose, xy_tolerance, yaw_tolerance, timeout):
+        deadline = time.time() + timeout
+        last_error = None
+        last_exception = None
+
+        while time.time() <= deadline:
+            try:
+                current_pose = self.current_pose()
+                last_error = compute_pose_error(current_pose, target_pose)
+                if pose_within_tolerance(current_pose, target_pose, xy_tolerance, yaw_tolerance):
+                    self.rospy.loginfo(
+                        "AMCL pose settled: xy=%.3f yaw=%.3f",
+                        last_error["xy"],
+                        last_error["yaw"],
+                    )
+                    return
+            except Exception as exc:
+                last_exception = exc
+
+            self.rospy.sleep(0.2)
+
+        if last_error is not None:
+            raise RuntimeError(
+                "AMCL pose did not settle near initial pose within {:.1f}s: xy={:.3f}, yaw={:.3f}".format(
+                    timeout,
+                    last_error["xy"],
+                    last_error["yaw"],
+                )
+            )
+        raise RuntimeError(
+            "AMCL pose was not available within {:.1f}s after initial pose publication: {}".format(
+                timeout,
+                last_exception,
+            )
+        )
+
     def execute(self):
         results = []
         for task in self.config["tasks"]:

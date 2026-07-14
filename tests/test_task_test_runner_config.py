@@ -80,6 +80,60 @@ class TaskTestRunnerConfigTest(unittest.TestCase):
         self.assertTrue(runner.pose_within_tolerance((2.0, 8.05, 1.5708), [2.0, 8.05, 1.5708], 0.05, 0.05))
         self.assertFalse(runner.pose_within_tolerance((2.0, 8.05, 0.0), [2.0, 8.05, 1.5708], 0.05, 0.05))
 
+    def test_runner_waits_for_amcl_pose_after_publishing_initial_pose(self):
+        runner_module = load_runner_module()
+
+        class FakePose:
+            def __init__(self):
+                self.header = type("Header", (), {"frame_id": "", "stamp": None})()
+                position = type("Position", (), {"x": 0.0, "y": 0.0, "z": 0.0})()
+                orientation = type("Orientation", (), {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0})()
+                pose = type("Pose", (), {"position": position, "orientation": orientation})()
+                self.pose = type("PoseWithCovariance", (), {"pose": pose, "covariance": [0.0] * 36})()
+
+        class FakePublisher:
+            def publish(self, msg):
+                pass
+
+        class FakeRospy:
+            def __init__(self):
+                self.sleep_calls = []
+                self.Time = type("Time", (), {"now": staticmethod(lambda: 0.0)})
+
+            def Publisher(self, *args, **kwargs):
+                return FakePublisher()
+
+            def sleep(self, duration):
+                self.sleep_calls.append(duration)
+
+            def loginfo(self, *args):
+                pass
+
+        fake_runner = object.__new__(runner_module.TaskTestRunner)
+        fake_runner.config = {
+            "defaults": {
+                "initialize_amcl": True,
+                "initial_pose": [2.0, 8.05, 1.5708],
+                "frame_id": "map",
+                "xy_tolerance": 0.25,
+                "yaw_tolerance": 0.25,
+                "amcl_settle_timeout": 1.0,
+            }
+        }
+        fake_runner.initial_pose_topic = "/initialpose"
+        fake_runner.pose_msg_cls = FakePose
+        fake_runner.rospy = FakeRospy()
+        pose_checks = []
+
+        def current_pose():
+            pose_checks.append(True)
+            return (2.0, 8.05, 1.5708)
+
+        fake_runner.current_pose = current_pose
+        fake_runner.initialize_amcl_if_requested()
+
+        self.assertGreaterEqual(len(pose_checks), 1)
+
     def test_runner_is_installed_and_declares_runtime_dependencies(self):
         cmake = CMAKE.read_text(encoding="utf-8")
         package_xml = PACKAGE.read_text(encoding="utf-8")

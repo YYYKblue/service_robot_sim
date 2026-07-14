@@ -6,6 +6,7 @@ defaults:
   yaw_tolerance: 0.25
   initialize_amcl: true
   initial_pose: [2.0, 8.05, 1.5708]
+  amcl_settle_timeout: 8.0
 
 tasks:
   - name: task_1_take_medicine_to_ward_a

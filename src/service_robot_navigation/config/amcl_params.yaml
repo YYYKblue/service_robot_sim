@@ -5,6 +5,15 @@ global_frame_id: map
 tf_broadcast: true
 transform_tolerance: 0.3
 
+# Match the default Gazebo spawn pose used by sim_navigation.launch. Without
+# this, manual RViz goals can be planned from an uninitialized map->odom pose.
+initial_pose_x: 2.0
+initial_pose_y: 8.05
+initial_pose_a: 1.5708
+initial_cov_xx: 0.0025
+initial_cov_yy: 0.0025
+initial_cov_aa: 0.01
+
 # Particle filter
 min_particles: 300
 max_particles: 1000
