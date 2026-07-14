@@ -81,9 +81,14 @@ class RobotOptimizationConfigTest(unittest.TestCase):
             gmapping = yaml.safe_load(fh)
         with (NAV_CONFIG / "costmap_common_params.yaml").open(encoding="utf-8") as fh:
             costmap_common = yaml.safe_load(fh)
+        with (NAV_CONFIG / "global_planner_params.yaml").open(encoding="utf-8") as fh:
+            global_planner = yaml.safe_load(fh)
 
         self.assertFalse(dwa["DWAPlannerROS"]["publish_traj_pc"])
         self.assertFalse(dwa["DWAPlannerROS"]["publish_cost_grid_pc"])
+        self.assertEqual(0.15, dwa["DWAPlannerROS"]["xy_goal_tolerance"])
+        self.assertEqual(0.20, dwa["DWAPlannerROS"]["yaw_goal_tolerance"])
+        self.assertEqual(0.05, dwa["DWAPlannerROS"]["min_vel_theta"])
 
         self.assertFalse(local_costmap["always_send_full_costmap"])
         self.assertEqual(5.0, local_costmap["update_frequency"])
@@ -95,7 +100,13 @@ class RobotOptimizationConfigTest(unittest.TestCase):
 
         self.assertLessEqual(amcl["max_particles"], 1000)
         self.assertLessEqual(gmapping["particles"], 30)
-        self.assertEqual(0.30, costmap_common["inflation_layer"]["inflation_radius"])
+        self.assertEqual(0.25, costmap_common["robot_radius"])
+        self.assertEqual(0.0, costmap_common["footprint_padding"])
+        self.assertEqual(0.26, costmap_common["inflation_layer"]["inflation_radius"])
+        self.assertEqual(12.0, costmap_common["inflation_layer"]["cost_scaling_factor"])
+
+        self.assertEqual(0.20, global_planner["GlobalPlanner"]["default_tolerance"])
+        self.assertTrue(global_planner["GlobalPlanner"]["use_grid_path"])
 
 
 if __name__ == "__main__":

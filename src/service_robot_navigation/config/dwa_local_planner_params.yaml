@@ -9,7 +9,7 @@ DWAPlannerROS:
 
   # Rotational velocity limits
   max_vel_theta: 1.00
-  min_vel_theta: 0.20
+  min_vel_theta: 0.05
 
   # Acceleration limits
   acc_lim_x: 0.80
@@ -25,8 +25,8 @@ DWAPlannerROS:
   angular_sim_granularity: 0.025
 
   # Goal tolerances
-  xy_goal_tolerance: 0.08
-  yaw_goal_tolerance: 0.08
+  xy_goal_tolerance: 0.15
+  yaw_goal_tolerance: 0.20
   latch_xy_goal_tolerance: true
 
   # Trajectory scoring

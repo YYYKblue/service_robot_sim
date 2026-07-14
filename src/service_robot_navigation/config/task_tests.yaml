@@ -4,6 +4,8 @@ defaults:
   hold_time: 1.0
   xy_tolerance: 0.25
   yaw_tolerance: 0.25
+  initialize_amcl: true
+  initial_pose: [2.0, 8.05, 1.5708]
 
 tasks:
   - name: task_1_take_medicine_to_ward_a
@@ -36,7 +38,7 @@ tasks:
         pose: [2.5, 2.15, 1.5708]
         hold_time: 1.5
       - name: long_counter_right
-        pose: [3.35, 2.15, 1.5708]
+        pose: [3.05, 2.15, 1.5708]
         hold_time: 1.5
         xy_tolerance: 0.30
 

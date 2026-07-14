@@ -44,6 +44,11 @@ def compute_pose_error(current_pose, target_pose):
     }
 
 
+def pose_within_tolerance(current_pose, target_pose, xy_tolerance, yaw_tolerance):
+    error = compute_pose_error(current_pose, target_pose)
+    return error["xy"] <= xy_tolerance and error["yaw"] <= yaw_tolerance
+
+
 def load_task_config(path):
     config_path = Path(path)
     with config_path.open(encoding="utf-8") as fh:
@@ -80,6 +85,25 @@ def get_setting(config, waypoint, key):
     return config.get("defaults", {}).get(key)
 
 
+def make_initial_pose(pose_msg_cls, pose, frame_id):
+    msg = pose_msg_cls()
+    msg.header.frame_id = frame_id
+    msg.pose.pose.position.x = float(pose[0])
+    msg.pose.pose.position.y = float(pose[1])
+    msg.pose.pose.position.z = 0.0
+
+    quat = yaw_to_quaternion(float(pose[2]))
+    msg.pose.pose.orientation.x = quat["x"]
+    msg.pose.pose.orientation.y = quat["y"]
+    msg.pose.pose.orientation.z = quat["z"]
+    msg.pose.pose.orientation.w = quat["w"]
+
+    msg.pose.covariance[0] = 0.05 * 0.05
+    msg.pose.covariance[7] = 0.05 * 0.05
+    msg.pose.covariance[35] = 0.10 * 0.10
+    return msg
+
+
 def make_goal(move_base_goal_cls, waypoint, frame_id):
     goal = move_base_goal_cls()
     goal.target_pose.header.frame_id = frame_id
@@ -104,7 +128,13 @@ def pose_tuple_from_amcl(msg):
 
 
 class TaskTestRunner:
-    def __init__(self, config, move_base_name="/move_base", pose_topic="/amcl_pose"):
+    def __init__(
+        self,
+        config,
+        move_base_name="/move_base",
+        pose_topic="/amcl_pose",
+        initial_pose_topic="/initialpose",
+    ):
         import actionlib
         import rospy
         from actionlib_msgs.msg import GoalStatus
@@ -119,6 +149,7 @@ class TaskTestRunner:
         self.client = actionlib.SimpleActionClient(move_base_name, MoveBaseAction)
         self.config = config
         self.pose_topic = pose_topic
+        self.initial_pose_topic = initial_pose_topic
 
     def wait_for_server(self, timeout):
         self.rospy.loginfo("Waiting for move_base action server...")
@@ -132,6 +163,30 @@ class TaskTestRunner:
             timeout=5.0,
         )
         return pose_tuple_from_amcl(msg)
+
+    def initialize_amcl_if_requested(self):
+        if not self.config.get("defaults", {}).get("initialize_amcl", False):
+            return
+
+        initial_pose = self.config.get("defaults", {}).get("initial_pose")
+        if not initial_pose:
+            raise RuntimeError("initialize_amcl is true but defaults.initial_pose is missing")
+
+        frame_id = self.config.get("defaults", {}).get("frame_id") or "map"
+        publisher = self.rospy.Publisher(
+            self.initial_pose_topic,
+            self.pose_msg_cls,
+            queue_size=1,
+            latch=True,
+        )
+        self.rospy.sleep(0.5)
+
+        msg = make_initial_pose(self.pose_msg_cls, initial_pose, frame_id)
+        self.rospy.loginfo("Publishing AMCL initial pose: %s", initial_pose)
+        for _ in range(5):
+            msg.header.stamp = self.rospy.Time.now()
+            publisher.publish(msg)
+            self.rospy.sleep(0.2)
 
     def execute(self):
         results = []
@@ -177,6 +232,21 @@ class TaskTestRunner:
         hold_time = float(get_setting(self.config, waypoint, "hold_time") or 0.0)
         xy_tolerance = float(get_setting(self.config, waypoint, "xy_tolerance") or 0.25)
         yaw_tolerance = float(get_setting(self.config, waypoint, "yaw_tolerance") or 0.25)
+
+        try:
+            current_pose = self.current_pose()
+            if pose_within_tolerance(current_pose, waypoint["pose"], xy_tolerance, yaw_tolerance):
+                self.rospy.loginfo("Waypoint already satisfied: %s", waypoint["name"])
+                if hold_time > 0:
+                    self.rospy.sleep(hold_time)
+                return {
+                    "name": waypoint["name"],
+                    "success": True,
+                    "duration": 0.0,
+                    "error": compute_pose_error(current_pose, waypoint["pose"]),
+                }
+        except Exception as exc:
+            self.rospy.logwarn("Could not pre-check current pose before waypoint %s: %s", waypoint["name"], exc)
 
         self.rospy.loginfo("Sending waypoint: %s -> %s", waypoint["name"], waypoint["pose"])
         goal = make_goal(self.goal_cls, waypoint, frame_id)
@@ -247,6 +317,7 @@ def parse_args(argv):
     parser.add_argument("--config", default=str(DEFAULT_CONFIG), help="Path to task_tests.yaml")
     parser.add_argument("--move-base", default="/move_base", help="move_base action name")
     parser.add_argument("--pose-topic", default="/amcl_pose", help="Pose topic used for final error checks")
+    parser.add_argument("--initial-pose-topic", default="/initialpose", help="AMCL initial pose topic")
     parser.add_argument("--server-timeout", type=float, default=30.0, help="Seconds to wait for move_base")
     return parser.parse_args(argv)
 
@@ -258,8 +329,9 @@ def main(argv=None):
     import rospy
 
     rospy.init_node("service_robot_task_test_runner")
-    runner = TaskTestRunner(config, args.move_base, args.pose_topic)
+    runner = TaskTestRunner(config, args.move_base, args.pose_topic, args.initial_pose_topic)
     runner.wait_for_server(args.server_timeout)
+    runner.initialize_amcl_if_requested()
     results = runner.execute()
     print_summary(results)
 

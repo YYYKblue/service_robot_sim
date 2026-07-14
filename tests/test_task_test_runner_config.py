@@ -25,6 +25,9 @@ class TaskTestRunnerConfigTest(unittest.TestCase):
         with TASK_CONFIG.open(encoding="utf-8") as fh:
             config = yaml.safe_load(fh)
 
+        self.assertTrue(config["defaults"]["initialize_amcl"])
+        self.assertEqual([2.0, 8.05, 1.5708], config["defaults"]["initial_pose"])
+
         task_names = [task["name"] for task in config["tasks"]]
         self.assertEqual(
             [
@@ -46,6 +49,7 @@ class TaskTestRunnerConfigTest(unittest.TestCase):
         self.assertEqual(2, len(config["tasks"][0]["waypoints"]))
         self.assertEqual(2, len(config["tasks"][1]["waypoints"]))
         self.assertEqual(3, len(config["tasks"][2]["waypoints"]))
+        self.assertEqual([3.05, 2.15, 1.5708], config["tasks"][2]["waypoints"][2]["pose"])
         self.assertGreaterEqual(len(config["tasks"][3]["waypoints"]), 3)
         self.assertGreaterEqual(len(config["tasks"][4]["waypoints"]), 4)
 
@@ -61,6 +65,9 @@ class TaskTestRunnerConfigTest(unittest.TestCase):
         error = runner.compute_pose_error((1.0, 2.0, 3.10), (1.3, 1.6, -3.10))
         self.assertAlmostEqual(0.5, error["xy"], places=6)
         self.assertAlmostEqual(0.08318530717958605, error["yaw"], places=6)
+
+        self.assertTrue(runner.pose_within_tolerance((2.0, 8.05, 1.5708), [2.0, 8.05, 1.5708], 0.05, 0.05))
+        self.assertFalse(runner.pose_within_tolerance((2.0, 8.05, 0.0), [2.0, 8.05, 1.5708], 0.05, 0.05))
 
     def test_runner_is_installed_and_declares_runtime_dependencies(self):
         cmake = CMAKE.read_text(encoding="utf-8")
