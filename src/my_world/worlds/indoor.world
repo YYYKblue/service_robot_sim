@@ -38,14 +38,14 @@
       <visual name="visual"><geometry><box><size>0.2 1.925 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
       <static>true</static></model>
       
-    <model name="hushizhan_bottom_a"><pose>0.5625 5.7 1 0 0 0</pose>
-      <link name="link"><collision name="collision"><geometry><box><size>1.125 0.2 2</size></box></geometry></collision>
-      <visual name="visual"><geometry><box><size>1.125 0.2 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
+    <model name="hushizhan_bottom_a"><pose>0.5 5.7 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>1 0.2 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>1 0.2 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
       <static>true</static></model>
       
-    <model name="hushizhan_bottom_b"><pose>2.9375 5.7 1 0 0 0</pose>
-      <link name="link"><collision name="collision"><geometry><box><size>2.125 0.2 2</size></box></geometry></collision>
-      <visual name="visual"><geometry><box><size>2.125 0.2 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
+    <model name="hushizhan_bottom_b"><pose>2.975 5.7 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>2.05 0.2 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>2.05 0.2 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
       <static>true</static></model>
       
     <model name="hushizhan_tabble"><pose>2 9 0.6 0 0 0</pose>
@@ -59,34 +59,34 @@
       <static>true</static></model>
       
     <!-- ==================== 横向错位通道 ==================== -->
-    <model name="heng_top_a"><pose>5.45 8.45 1 0 0 0</pose>
-      <link name="link"><collision name="collision"><geometry><box><size>2.9 0.2 2</size></box></geometry></collision>
-      <visual name="visual"><geometry><box><size>2.9 0.2 2</size></box></geometry><material><ambient>0.8 0.4 0 1</ambient></material></visual></link>
+    <model name="heng_top_a"><pose>5.5 8.55 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>3.0 0.2 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>3.0 0.2 2</size></box></geometry><material><ambient>0.8 0.4 0 1</ambient></material></visual></link>
       <static>true</static></model>   
       
-    <model name="heng_top_b"><pose>5.1 7.55 1 0 0 0</pose>
+    <model name="heng_top_b"><pose>5.1 7.45 1 0 0 0</pose>
       <link name="link"><collision name="collision"><geometry><box><size>2.2 0.2 2</size></box></geometry></collision>
       <visual name="visual"><geometry><box><size>2.2 0.2 2</size></box></geometry><material><ambient>0.8 0.4 0 1</ambient></material></visual></link>
       <static>true</static></model> 
       
-    <model name="heng_left"><pose>6.1 6.7 1 0 0 0</pose>
+    <model name="heng_left"><pose>6.0 6.7 1 0 0 0</pose>
       <link name="link"><collision name="collision"><geometry><box><size>0.2 1.5 2</size></box></geometry></collision>
       <visual name="visual"><geometry><box><size>0.2 1.5 2</size></box></geometry><material><ambient>0.8 0.4 0 1</ambient></material></visual></link>
       <static>true</static></model>
       
-    <model name="heng_right"><pose>7 7.6 1 0 0 0</pose>
-      <link name="link"><collision name="collision"><geometry><box><size>0.2 1.5 2</size></box></geometry></collision>
-      <visual name="visual"><geometry><box><size>0.2 1.5 2</size></box></geometry><material><ambient>0.8 0.4 0 1</ambient></material></visual></link>
+    <model name="heng_right"><pose>7.1 7.65 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>0.2 1.6 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>0.2 1.6 2</size></box></geometry><material><ambient>0.8 0.4 0 1</ambient></material></visual></link>
       <static>true</static></model>
       
-    <model name="heng_bottom_a"><pose>7.95 6.85 1 0 0 0</pose>
+    <model name="heng_bottom_a"><pose>7.95 6.95 1 0 0 0</pose>
       <link name="link"><collision name="collision"><geometry><box><size>2.1 0.2 2</size></box></geometry></collision>
       <visual name="visual"><geometry><box><size>2.1 0.2 2</size></box></geometry><material><ambient>0.8 0.4 0 1</ambient></material></visual></link>
       <static>true</static></model> 
       
-    <model name="heng_bottom_b"><pose>7.6 5.95 1 0 0 0</pose>
-      <link name="link"><collision name="collision"><geometry><box><size>2.8 0.2 2</size></box></geometry></collision>
-      <visual name="visual"><geometry><box><size>2.8 0.2 2</size></box></geometry><material><ambient>0.8 0.4 0 1</ambient></material></visual></link>
+    <model name="heng_bottom_b"><pose>7.55 5.85 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>2.9 0.2 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>2.9 0.2 2</size></box></geometry><material><ambient>0.8 0.4 0 1</ambient></material></visual></link>
       <static>true</static></model> 
 
     <!-- ==================== 病房A ==================== -->
@@ -100,14 +100,14 @@
       <visual name="visual"><geometry><box><size>0.2 0.15 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
       <static>true</static></model>    
       
-    <model name="A_bottom_a"><pose>9.5 5.7 1 0 0 0</pose>
-      <link name="link"><collision name="collision"><geometry><box><size>1 0.2 2</size></box></geometry></collision>
-      <visual name="visual"><geometry><box><size>1 0.2 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
+    <model name="A_bottom_a"><pose>9.45 5.7 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>0.9 0.2 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>0.9 0.2 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
       <static>true</static></model>
       
-    <model name="A_bottom_b"><pose>12.375 5.7 1 0 0 0</pose>
-      <link name="link"><collision name="collision"><geometry><box><size>3.25 0.2 2</size></box></geometry></collision>
-      <visual name="visual"><geometry><box><size>3.25 0.2 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
+    <model name="A_bottom_b"><pose>12.45 5.7 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>3.1 0.2 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>3.1 0.2 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
       <static>true</static></model>
       
     <model name="A_bed"><pose>12.75 8 0.4 0 0 0</pose>
@@ -193,12 +193,12 @@
       <static>true</static></model>
       
     <!-- ==================== 狭窄回转区 ==================== -->
-    <model name="L_top"><pose>9.5 3.1 1 0 0 0</pose>
+    <model name="L_top"><pose>9.5 3.25 1 0 0 0</pose>
       <link name="link"><collision name="collision"><geometry><box><size>5 0.2 2</size></box></geometry></collision>
       <visual name="visual"><geometry><box><size>5 0.2 2</size></box></geometry><material><ambient>1 0 0 1</ambient></material></visual></link>
       <static>true</static></model>
       
-    <model name="L_bottom"><pose>8.5 1.9 1 0 0 0</pose>
+    <model name="L_bottom"><pose>8.5 1.75 1 0 0 0</pose>
       <link name="link"><collision name="collision"><geometry><box><size>3 0.2 2</size></box></geometry></collision>
       <visual name="visual"><geometry><box><size>3 0.2 2</size></box></geometry><material><ambient>1 0 0 1</ambient></material></visual></link>
       <static>true</static></model>
@@ -208,12 +208,12 @@
       <visual name="visual"><geometry><box><size>0.2 1 2</size></box></geometry><material><ambient>1 0 0 1</ambient></material></visual></link>
       <static>true</static></model>
         
-    <model name="L_yuanzhu"><pose>11 2 0.6 0 0 0</pose>
+    <model name="L_yuanzhu"><pose>11 1.8 0.6 0 0 0</pose>
       <link name="link"><collision name="collision"><geometry><cylinder><radius>0.25</radius><length>1.2</length></cylinder></geometry></collision>
       <visual name="visual"><geometry><cylinder><radius>0.25</radius><length>1.2</length></cylinder></geometry><material><ambient>0 1 1 1</ambient></material></visual></link>
       <static>true</static></model>
       
-    <model name="narrow_obs_L1"><pose>7.5 2.95 0.2 0 0 0</pose>
+    <model name="narrow_obs_L1"><pose>7.5 3.05 0.2 0 0 0</pose>
       <link name="link">
         <collision name="collision"><geometry><box><size>0.4 0.1 0.4</size></box></geometry></collision>
         <visual name="visual"><geometry><box><size>0.4 0.1 0.4</size></box></geometry>
@@ -222,7 +222,7 @@
       <static>true</static>
     </model>
     
-    <model name="narrow_obs_L2"><pose>8.5 2.05 0.2 0 0 0</pose>
+    <model name="narrow_obs_L2"><pose>8.5 1.95 0.2 0 0 0</pose>
       <link name="link">
         <collision name="collision"><geometry><box><size>0.4 0.1 0.4</size></box></geometry></collision>
         <visual name="visual"><geometry><box><size>0.4 0.1 0.4</size></box></geometry>
@@ -231,7 +231,7 @@
       <static>true</static>
     </model>
     
-    <model name="narrow_obs_L3"><pose>9.5 2.95 0.2 0 0 0</pose>
+    <model name="narrow_obs_L3"><pose>9.5 3.05 0.2 0 0 0</pose>
       <link name="link">
         <collision name="collision"><geometry><box><size>0.4 0.1 0.4</size></box></geometry></collision>
         <visual name="visual"><geometry><box><size>0.4 0.1 0.4</size></box></geometry>
@@ -247,9 +247,14 @@
       <visual name="visual"><geometry><box><size>2 0.2 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
       <static>true</static></model>
       
-    <model name="charge_left"><pose>12.1 2.525 1 0 0 0</pose>
-      <link name="link"><collision name="collision"><geometry><box><size>0.2 3.55 2</size></box></geometry></collision>
-      <visual name="visual"><geometry><box><size>0.2 3.55 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
+    <model name="charge_left_lower"><pose>12.1 1.4 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>0.2 1.3 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>0.2 1.3 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="charge_left_upper"><pose>12.1 3.725 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>0.2 1.15 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>0.2 1.15 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
       <static>true</static></model>
       
     <model name="charge"><pose>13.8 2.6 0.6 0 0 0</pose>
