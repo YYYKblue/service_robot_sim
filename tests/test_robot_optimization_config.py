@@ -79,6 +79,8 @@ class RobotOptimizationConfigTest(unittest.TestCase):
             amcl = yaml.safe_load(fh)
         with (NAV_CONFIG / "gmapping_params.yaml").open(encoding="utf-8") as fh:
             gmapping = yaml.safe_load(fh)
+        with (NAV_CONFIG / "costmap_common_params.yaml").open(encoding="utf-8") as fh:
+            costmap_common = yaml.safe_load(fh)
 
         self.assertFalse(dwa["DWAPlannerROS"]["publish_traj_pc"])
         self.assertFalse(dwa["DWAPlannerROS"]["publish_cost_grid_pc"])
@@ -93,6 +95,7 @@ class RobotOptimizationConfigTest(unittest.TestCase):
 
         self.assertLessEqual(amcl["max_particles"], 1000)
         self.assertLessEqual(gmapping["particles"], 30)
+        self.assertEqual(0.30, costmap_common["inflation_layer"]["inflation_radius"])
 
 
 if __name__ == "__main__":

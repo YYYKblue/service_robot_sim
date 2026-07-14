@@ -9,7 +9,7 @@ raytrace_range: 3.5
 
 inflation_layer:
   enabled: true
-  inflation_radius: 0.38
+  inflation_radius: 0.30
   cost_scaling_factor: 8.0
 
 obstacle_layer:

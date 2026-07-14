@@ -1,9 +1,9 @@
 轮子网格来源: 用户提供的 obj.obj
-处理方式: 使用完整 OBJ 轮子细节；滚子单独输出为一个 STL，其余轮盘、轴承、螺丝、支撑轴、端盖全部输出为金属 STL。
+处理方式: RViz 优化版。保留真实全向轮整体造型、滚子、轮盘、轴承/螺丝轮廓；用 1.2mm 网格合并过密三角面，降低运行卡顿。
 坐标处理: 原模型单位按毫米转米；原模型 X 轴作为轮轴，已转换为 URDF 轮子 local Y 轴。
 源尺寸(mm): X=53.006, Y=99.999, Z=99.997
 ROS尺寸(m): 轮厚约 0.053, 轮直径约 0.100
-metal_triangles=1732132
-roller_triangles=264268
-included_faces={'metal': 1054838, 'rollers': 147064}
-used_object_face_counts={'DDM_Bace': 7048, 'DDM_Cap': 10560, 'DDM_M3_15mmscrew': 18510, 'DDM_Rotor': 2731, 'DDOW_M3_15mmscrew': 66486, 'DDOW_Part_2': 11190, 'DDOW_Part_3': 19263, 'DDOW_Part_5': 25898, 'DDOW_Roller': 147064, 'DDOW_Roller_Shaft': 7738, 'DDOW_Suport_Shaft': 28125, 'DDm_Stator_laminet': 2020, 'W_61809_2RS1': 48559, 'W_638_3_R_2RS1': 806710}
+优化网格: 1.2 mm
+metal_triangles=89468
+roller_triangles=44575
+source_faces_seen={'metal': 1054838, 'rollers': 147064}
