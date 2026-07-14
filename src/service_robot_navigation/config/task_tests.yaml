@@ -21,6 +21,22 @@ tasks:
   - name: task_2_take_medicine_to_ward_b
     description: Take medicine at the nurse station and deliver it to ward B.
     waypoints:
+      - name: ward_a_door
+        pose: [10.35, 6.15, -1.5708]
+        xy_tolerance: 0.30
+        yaw_tolerance: 0.35
+      - name: staggered_exit
+        pose: [8.4, 6.4, 3.1416]
+        xy_tolerance: 0.30
+        yaw_tolerance: 0.35
+      - name: staggered_mid
+        pose: [6.55, 7.15, 3.1416]
+        xy_tolerance: 0.30
+        yaw_tolerance: 0.35
+      - name: staggered_entry
+        pose: [4.5, 8.0, 3.1416]
+        xy_tolerance: 0.30
+        yaw_tolerance: 0.35
       - name: take_medicine
         pose: [2.0, 8.05, 1.5708]
         hold_time: 2.0
@@ -47,10 +63,16 @@ tasks:
     waypoints:
       - name: staggered_entry
         pose: [4.5, 8.0, 0.0]
+        xy_tolerance: 0.30
+        yaw_tolerance: 0.35
       - name: staggered_mid
         pose: [6.55, 7.15, -1.5708]
+        xy_tolerance: 0.30
+        yaw_tolerance: 0.35
       - name: staggered_exit
         pose: [8.4, 6.4, 0.0]
+        xy_tolerance: 0.30
+        yaw_tolerance: 0.35
 
   - name: task_5_narrow_area_to_dock
     description: Pass through the narrow area and finish at the docking point.

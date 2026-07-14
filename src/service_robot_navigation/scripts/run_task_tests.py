@@ -134,6 +134,7 @@ class TaskTestRunner:
         move_base_name="/move_base",
         pose_topic="/amcl_pose",
         initial_pose_topic="/initialpose",
+        clear_costmaps_service="/move_base/clear_costmaps",
     ):
         import actionlib
         import rospy
@@ -150,6 +151,7 @@ class TaskTestRunner:
         self.config = config
         self.pose_topic = pose_topic
         self.initial_pose_topic = initial_pose_topic
+        self.clear_costmaps_service = clear_costmaps_service
 
     def wait_for_server(self, timeout):
         self.rospy.loginfo("Waiting for move_base action server...")
@@ -226,6 +228,19 @@ class TaskTestRunner:
             "waypoints": waypoint_results,
         }
 
+    def clear_costmaps(self):
+        if not self.clear_costmaps_service:
+            return
+        try:
+            from std_srvs.srv import Empty
+
+            self.rospy.wait_for_service(self.clear_costmaps_service, timeout=1.0)
+            clear = self.rospy.ServiceProxy(self.clear_costmaps_service, Empty)
+            clear()
+            self.rospy.sleep(0.2)
+        except Exception as exc:
+            self.rospy.logwarn("Could not clear costmaps via %s: %s", self.clear_costmaps_service, exc)
+
     def execute_waypoint(self, waypoint):
         frame_id = get_setting(self.config, waypoint, "frame_id") or "map"
         timeout = float(get_setting(self.config, waypoint, "timeout") or 90.0)
@@ -248,6 +263,7 @@ class TaskTestRunner:
         except Exception as exc:
             self.rospy.logwarn("Could not pre-check current pose before waypoint %s: %s", waypoint["name"], exc)
 
+        self.clear_costmaps()
         self.rospy.loginfo("Sending waypoint: %s -> %s", waypoint["name"], waypoint["pose"])
         goal = make_goal(self.goal_cls, waypoint, frame_id)
         goal.target_pose.header.stamp = self.rospy.Time.now()
@@ -318,6 +334,11 @@ def parse_args(argv):
     parser.add_argument("--move-base", default="/move_base", help="move_base action name")
     parser.add_argument("--pose-topic", default="/amcl_pose", help="Pose topic used for final error checks")
     parser.add_argument("--initial-pose-topic", default="/initialpose", help="AMCL initial pose topic")
+    parser.add_argument(
+        "--clear-costmaps-service",
+        default="/move_base/clear_costmaps",
+        help="Service to clear move_base costmaps before each unsatisfied waypoint; use '' to disable",
+    )
     parser.add_argument("--server-timeout", type=float, default=30.0, help="Seconds to wait for move_base")
     return parser.parse_args(argv)
 
@@ -329,7 +350,13 @@ def main(argv=None):
     import rospy
 
     rospy.init_node("service_robot_task_test_runner")
-    runner = TaskTestRunner(config, args.move_base, args.pose_topic, args.initial_pose_topic)
+    runner = TaskTestRunner(
+        config,
+        args.move_base,
+        args.pose_topic,
+        args.initial_pose_topic,
+        args.clear_costmaps_service,
+    )
     runner.wait_for_server(args.server_timeout)
     runner.initialize_amcl_if_requested()
     results = runner.execute()

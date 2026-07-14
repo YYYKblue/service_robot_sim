@@ -47,7 +47,18 @@ class TaskTestRunnerConfigTest(unittest.TestCase):
                 self.assertIsInstance(waypoint["pose"][2], (int, float))
 
         self.assertEqual(2, len(config["tasks"][0]["waypoints"]))
-        self.assertEqual(2, len(config["tasks"][1]["waypoints"]))
+        self.assertGreaterEqual(len(config["tasks"][1]["waypoints"]), 6)
+        self.assertEqual(
+            [
+                "ward_a_door",
+                "staggered_exit",
+                "staggered_mid",
+                "staggered_entry",
+                "take_medicine",
+                "ward_b",
+            ],
+            [waypoint["name"] for waypoint in config["tasks"][1]["waypoints"]],
+        )
         self.assertEqual(3, len(config["tasks"][2]["waypoints"]))
         self.assertEqual([3.05, 2.15, 1.5708], config["tasks"][2]["waypoints"][2]["pose"])
         self.assertGreaterEqual(len(config["tasks"][3]["waypoints"]), 3)
@@ -80,6 +91,7 @@ class TaskTestRunnerConfigTest(unittest.TestCase):
             "actionlib_msgs",
             "move_base_msgs",
             "geometry_msgs",
+            "std_srvs",
             "python3-yaml",
         ]:
             self.assertIn(f"<exec_depend>{dependency}</exec_depend>", package_xml)
