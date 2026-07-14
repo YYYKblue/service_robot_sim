@@ -1,0 +1,14 @@
+wheel_radius: 0.05
+base_radius: 0.145
+cmd_vel_topic: /cmd_vel
+odom_topic: /odom
+scan_topic: /scan
+frames:
+  odom: odom
+  base_footprint: base_footprint
+  base_link: base_link
+  lidar: lidar_link
+motion_dof:
+  linear_x: true
+  linear_y: true
+  angular_z: true

@@ -1,0 +1,9 @@
+bool start_recording
+float32 record_seconds
+---
+bool success
+string keyword
+string transcript
+string raw_result
+string error_message
+float32 processing_time

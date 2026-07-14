@@ -1,0 +1,8 @@
+prefix=/home/bboss/service_rebot/devel
+
+Name: cloud_tts
+Description: Description of cloud_tts
+Version: 0.0.0
+Cflags: -I/home/bboss/service_rebot/devel/include
+Libs: -L${prefix}/lib 
+Requires: rospy std_msgs message_runtime

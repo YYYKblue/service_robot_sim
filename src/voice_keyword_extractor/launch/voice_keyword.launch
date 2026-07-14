@@ -1,0 +1,7 @@
+<launch>
+  <node pkg="voice_keyword_extractor"
+        type="keyword_service_node.py"
+        name="keyword_service_node"
+        output="screen"
+        respawn="false"/>
+</launch>

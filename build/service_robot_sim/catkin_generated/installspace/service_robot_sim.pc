@@ -1,0 +1,8 @@
+prefix=/home/bboss/service_rebot/install
+
+Name: service_robot_sim
+Description: Description of service_robot_sim
+Version: 0.1.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

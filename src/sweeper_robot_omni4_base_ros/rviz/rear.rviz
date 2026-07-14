@@ -1,0 +1,46 @@
+Panels:
+  - Class: rviz/Displays
+    Name: Displays
+  - Class: rviz/Views
+    Name: Views
+Visualization Manager:
+  Displays:
+    - Alpha: 0.55
+      Cell Size: 0.05
+      Class: rviz/Grid
+      Color: 160; 160; 160
+      Enabled: true
+      Name: 地面网格
+      Plane: XY
+      Reference Frame: base_footprint
+    - Class: rviz/RobotModel
+      Collision Enabled: false
+      Enabled: true
+      Name: 底盘四全向轮机器人模型
+      Robot Description: robot_description
+      Visual Enabled: true
+  Global Options:
+    Background Color: 245; 245; 245
+    Fixed Frame: base_footprint
+    Frame Rate: 30
+  Tools:
+    - Class: rviz/Interact
+    - Class: rviz/MoveCamera
+    - Class: rviz/Select
+  Views:
+    Current:
+      Class: rviz/Orbit
+      Distance: 0.7
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 0.08
+      Pitch: 0.24
+      Target Frame: base_footprint
+      Yaw: 3.14
+    Saved: ~
+Window Geometry:
+  Height: 820
+  Width: 1120
+  X: 80
+  Y: 60

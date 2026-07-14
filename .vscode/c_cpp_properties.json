@@ -1,0 +1,32 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/bboss/handeye_ws/devel/include/**",
+        "/home/bboss/kinova_ws/devel/include/**",
+        "/opt/ros/noetic/include/**",
+        "/home/bboss/kfoura_ws/src/azure_kinect_ros_driver/include/**",
+        "/home/bboss/explore_ws/src/m-explore/explore/include/**",
+        "/home/bboss/kinova_ws/src/kinova-ros/kinova_moveit/inverse_kinematics_plugins/ikfast/j2n6s300_ikfast/include/**",
+        "/home/bboss/kinova_ws/src/kinova-ros/kinova_moveit/inverse_kinematics_plugins/ikfast/j2s6s300_ikfast/include/**",
+        "/home/bboss/kinova_ws/src/kinova-ros/kinova_moveit/inverse_kinematics_plugins/ikfast/j2s7s300_ikfast/include/**",
+        "/home/bboss/kinova_ws/src/kinova-ros/kinova_moveit/kinova_arm_moveit_demo/include/**",
+        "/home/bboss/kinova_ws/src/kinova-ros/kinova_driver/include/**",
+        "/home/bboss/kinova_ws/src/kinova-ros/kinova_moveit/inverse_kinematics_plugins/ikfast/m1n6s300_ikfast/include/**",
+        "/home/bboss/explore_ws/src/m-explore/map_merge/include/**",
+        "/home/bboss/handeye_ws/src/my_vision_config/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

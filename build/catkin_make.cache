@@ -1,0 +1,2 @@
+cloud_tts:my_world:service_robot_navigation:service_robot_sim:sweeper_robot_omni4_base_ros:voice_keyword_extractor
+-DCATKIN_DEVEL_PREFIX=/home/bboss/service_rebot/devel -DCMAKE_INSTALL_PREFIX=/home/bboss/service_rebot/install -G Unix Makefiles

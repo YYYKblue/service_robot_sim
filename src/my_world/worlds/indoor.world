@@ -1,0 +1,273 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <world name="omni_vs_diff_world">
+    
+    <!-- 地面和光源 -->
+    <include><uri>model://ground_plane</uri></include>
+    <include><uri>model://sun</uri></include>
+    
+    <!-- ==================== 外墙壁 (14m x 10m) ==================== -->
+    <model name="wall_top"><pose>7 10.1 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>14 0.2 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>14 0.2 2</size></box></geometry><material><ambient>0.5 0.5 0.5 1</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="wall_bottom"><pose>7 -0.1 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>14 0.2 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>14 0.2 2</size></box></geometry><material><ambient>0.5 0.5 0.5 1</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="wall_left"><pose>-0.1 5 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>0.2 10.2 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>0.2 10.2 2</size></box></geometry><material><ambient>0.5 0.5 0.5 1</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="wall_right"><pose>14.1 5 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>0.2 10.2 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>0.2 10.2 2</size></box></geometry><material><ambient>0.5 0.5 0.5 1</ambient></material></visual></link>
+      <static>true</static></model>
+
+        <!-- ==================== 护士站 (4*4.3) ==================== -->
+    <model name="hushizhan_right_a"><pose>4 9.1875 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>0.2 1.625 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>0.2 1.625 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="hushizhan_right_b"><pose>4 6.5625 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>0.2 1.925 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>0.2 1.925 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="hushizhan_bottom_a"><pose>0.5625 5.7 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>1.125 0.2 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>1.125 0.2 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="hushizhan_bottom_b"><pose>2.9375 5.7 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>2.125 0.2 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>2.125 0.2 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="hushizhan_tabble"><pose>2 9 0.6 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>2 0.8 1.2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>2 0.8 1.2</size></box></geometry><material><ambient>1 1 0 1</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="service_1"><pose>2 8.05 0.05 0 0 0</pose>
+      <link name="link"><visual name="visual"><geometry><cylinder><radius>0.25</radius><length>0.1</length></cylinder></geometry>
+      <material><ambient>0 1 1 0</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <!-- ==================== 横向错位通道 ==================== -->
+    <model name="heng_top_a"><pose>5.45 8.45 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>2.9 0.2 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>2.9 0.2 2</size></box></geometry><material><ambient>0.8 0.4 0 1</ambient></material></visual></link>
+      <static>true</static></model>   
+      
+    <model name="heng_top_b"><pose>5.1 7.55 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>2.2 0.2 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>2.2 0.2 2</size></box></geometry><material><ambient>0.8 0.4 0 1</ambient></material></visual></link>
+      <static>true</static></model> 
+      
+    <model name="heng_left"><pose>6.1 6.7 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>0.2 1.5 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>0.2 1.5 2</size></box></geometry><material><ambient>0.8 0.4 0 1</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="heng_right"><pose>7 7.6 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>0.2 1.5 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>0.2 1.5 2</size></box></geometry><material><ambient>0.8 0.4 0 1</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="heng_bottom_a"><pose>7.95 6.85 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>2.1 0.2 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>2.1 0.2 2</size></box></geometry><material><ambient>0.8 0.4 0 1</ambient></material></visual></link>
+      <static>true</static></model> 
+      
+    <model name="heng_bottom_b"><pose>7.6 5.95 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>2.8 0.2 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>2.8 0.2 2</size></box></geometry><material><ambient>0.8 0.4 0 1</ambient></material></visual></link>
+      <static>true</static></model> 
+
+    <!-- ==================== 病房A ==================== -->
+    <model name="A_left_a"><pose>9 8.475 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>0.2 3.05 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>0.2 3.05 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
+      <static>true</static></model> 
+      
+    <model name="A_left_b"><pose>9 5.775 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>0.2 0.15 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>0.2 0.15 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
+      <static>true</static></model>    
+      
+    <model name="A_bottom_a"><pose>9.5 5.7 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>1 0.2 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>1 0.2 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="A_bottom_b"><pose>12.375 5.7 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>3.25 0.2 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>3.25 0.2 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="A_bed"><pose>12.75 8 0.4 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>1.5 2 0.8</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>1.5 2 0.8</size></box></geometry><material><ambient>0 0 1 1</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="A_tabble"><pose>11.3 8.7 0.3 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>0.6 0.6 0.6</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>0.6 0.6 0.6</size></box></geometry><material><ambient>1 1 0 1</ambient></material></visual></link>
+      <static>true</static></model>
+    
+    <model name="service_2"><pose>11.3 7.85 0.05 0 0 0</pose>
+      <link name="link"><visual name="visual"><geometry><cylinder><radius>0.25</radius><length>0.1</length></cylinder></geometry>
+      <material><ambient>0 1 1 0</ambient></material></visual></link>
+      <static>true</static></model>
+    
+    <!-- ==================== 长柜台服务区 ==================== -->
+    <model name="long_top_a"><pose>0.125 4.3 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>0.25 0.2 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>0.25 0.2 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
+      <static>true</static></model>
+ 
+    <model name="long_top_b"><pose>4 4.3 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>6 0.2 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>6 0.2 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
+      <static>true</static></model>
+    
+    <model name="long_tabble"><pose>2.5 3 0.6 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>2.5 0.8 1.2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>2.5 0.8 1.2</size></box></geometry><material><ambient>1 1 0 1</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="service_3"><pose>2.5 2.15 0.05 0 0 0</pose>
+      <link name="link"><visual name="visual"><geometry><cylinder><radius>0.25</radius><length>0.1</length></cylinder></geometry>
+      <material><ambient>0 1 1 0</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="service_4"><pose>1.55 2.15 0.05 0 0 0</pose>
+      <link name="link"><visual name="visual"><geometry><cylinder><radius>0.25</radius><length>0.1</length></cylinder></geometry>
+      <material><ambient>0 1 1 0</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="service_5"><pose>3.45 2.15 0.05 0 0 0</pose>
+      <link name="link"><visual name="visual"><geometry><cylinder><radius>0.25</radius><length>0.1</length></cylinder></geometry>
+      <material><ambient>0 1 1 0</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <!-- ==================== 病房B ==================== -->
+    <model name="B_left"><pose>4 3.025 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>0.2 2.55 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>0.2 2.55 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="B_bottom"><pose>5.5 1 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>3 0.2 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>3 0.2 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="B_right_a"><pose>7 3.65 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>0.2 1.3 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>0.2 1.3 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="B_right_b"><pose>7 1.5 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>0.2 1 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>0.2 1 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="B_bed"><pose>5 3.55 0.4 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>2 1.5 0.8</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>2 1.5 0.8</size></box></geometry><material><ambient>0 0 1 1</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="B_tabble"><pose>4.3 2.4 0.3 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>0.6 0.6 0.6</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>0.6 0.6 0.6</size></box></geometry><material><ambient>1 1 0 1</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="service_6"><pose>5.15 2.4 0.05 0 0 0</pose>
+      <link name="link"><visual name="visual"><geometry><cylinder><radius>0.25</radius><length>0.1</length></cylinder></geometry>
+      <material><ambient>0 1 1 0</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <!-- ==================== 狭窄回转区 ==================== -->
+    <model name="L_top"><pose>9.5 3.1 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>5 0.2 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>5 0.2 2</size></box></geometry><material><ambient>1 0 0 1</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="L_bottom"><pose>8.5 1.9 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>3 0.2 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>3 0.2 2</size></box></geometry><material><ambient>1 0 0 1</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="L_shu"><pose>9.9 1.5 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>0.2 1 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>0.2 1 2</size></box></geometry><material><ambient>1 0 0 1</ambient></material></visual></link>
+      <static>true</static></model>
+        
+    <model name="L_yuanzhu"><pose>11 2 0.6 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><cylinder><radius>0.25</radius><length>1.2</length></cylinder></geometry></collision>
+      <visual name="visual"><geometry><cylinder><radius>0.25</radius><length>1.2</length></cylinder></geometry><material><ambient>0 1 1 1</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="narrow_obs_L1"><pose>7.5 2.95 0.2 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.4 0.1 0.4</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>0.4 0.1 0.4</size></box></geometry>
+        <material><ambient>0 0 0 1</ambient></material></visual>
+      </link>
+      <static>true</static>
+    </model>
+    
+    <model name="narrow_obs_L2"><pose>8.5 2.05 0.2 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.4 0.1 0.4</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>0.4 0.1 0.4</size></box></geometry>
+        <material><ambient>0 0 0 1</ambient></material></visual>
+      </link>
+      <static>true</static>
+    </model>
+    
+    <model name="narrow_obs_L3"><pose>9.5 2.95 0.2 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.4 0.1 0.4</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>0.4 0.1 0.4</size></box></geometry>
+        <material><ambient>0 0 0 1</ambient></material></visual>
+      </link>
+      <static>true</static>
+    </model>
+  
+     
+    <!-- ==================== 充电区 ==================== -->
+    <model name="charge_top"><pose>13 4.3 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>2 0.2 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>2 0.2 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="charge_left"><pose>12.1 2.525 1 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>0.2 3.55 2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>0.2 3.55 2</size></box></geometry><material><ambient>1 1 1 1</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="charge"><pose>13.8 2.6 0.6 0 0 0</pose>
+      <link name="link"><collision name="collision"><geometry><box><size>0.4 1.8 1.2</size></box></geometry></collision>
+      <visual name="visual"><geometry><box><size>0.4 1.8 1.2</size></box></geometry><material><ambient>0 1 0 1</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="charge_sign"><pose>13.25 2.6 0.05 0 0 0</pose>
+      <link name="link"><visual name="visual"><geometry><box><size>1.5 2 0.1</size></box></geometry>
+      <material><ambient>0 0.8 0 0</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    <model name="service_7"><pose>13.25 2.6 0.05 0 0 0</pose>
+      <link name="link"><visual name="visual"><geometry><cylinder><radius>0.25</radius><length>0.1</length></cylinder></geometry>
+      <material><ambient>1 0 0 0</ambient></material></visual></link>
+      <static>true</static></model>
+      
+    
+
+  </world>
+</sdf>

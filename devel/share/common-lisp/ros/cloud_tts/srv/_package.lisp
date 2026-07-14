@@ -1,0 +1,10 @@
+(cl:defpackage cloud_tts-srv
+  (:use )
+  (:export
+   "SYNTHESIZESPEECH"
+   "<SYNTHESIZESPEECH-REQUEST>"
+   "SYNTHESIZESPEECH-REQUEST"
+   "<SYNTHESIZESPEECH-RESPONSE>"
+   "SYNTHESIZESPEECH-RESPONSE"
+  ))
+

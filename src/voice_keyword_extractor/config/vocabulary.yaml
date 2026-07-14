@@ -1,0 +1,13 @@
+allowed_keywords:
+  - coke
+  - medicine
+  - water
+  - milk
+  - unknown
+
+descriptions:
+  coke: 可乐、汽水、可口可乐
+  medicine: 药、药品、药物
+  water: 水、饮用水、矿泉水
+  milk: 牛奶
+  unknown: 无法确定或不属于以上类别

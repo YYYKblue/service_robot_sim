@@ -1,0 +1,9 @@
+<launch>
+    <node
+        pkg="cloud_tts"
+        type="tts_service_node.py"
+        name="cloud_tts_service_node"
+        output="screen"
+        respawn="false"
+    />
+</launch>

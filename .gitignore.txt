@@ -1,0 +1,26 @@
+# ROS build outputs
+build/
+devel/
+install/
+log/
+
+# Colcon
+build/
+install/
+log/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE
+.vscode/
+.idea/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# ROS runtime logs
+.ros/
