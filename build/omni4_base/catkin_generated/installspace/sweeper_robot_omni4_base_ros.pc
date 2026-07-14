@@ -1,8 +1,0 @@
-prefix=/home/bboss/service_rebot/install
-
-Name: sweeper_robot_omni4_base_ros
-Description: Description of sweeper_robot_omni4_base_ros
-Version: 1.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

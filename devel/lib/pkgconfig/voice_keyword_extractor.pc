@@ -1,8 +1,0 @@
-prefix=/home/bboss/service_rebot/devel
-
-Name: voice_keyword_extractor
-Description: Description of voice_keyword_extractor
-Version: 0.0.0
-Cflags: -I/home/bboss/service_rebot/devel/include
-Libs: -L${prefix}/lib 
-Requires: message_runtime rospy std_msgs
