@@ -7,7 +7,7 @@ transform_tolerance: 0.3
 
 # Particle filter
 min_particles: 300
-max_particles: 1500
+max_particles: 1000
 kld_err: 0.02
 kld_z: 0.99
 update_min_d: 0.05

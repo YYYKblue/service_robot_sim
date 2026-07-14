@@ -29,7 +29,7 @@ linearUpdate: 0.08
 angularUpdate: 0.08
 temporalUpdate: 1.0
 resampleThreshold: 0.5
-particles: 40
+particles: 30
 xmin: -5.0
 ymin: -5.0
 xmax: 20.0

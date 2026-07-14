@@ -24,3 +24,6 @@ Thumbs.db
 
 # ROS runtime logs
 .ros/
+
+# Local brainstorming/mockup sessions
+.superpowers/
