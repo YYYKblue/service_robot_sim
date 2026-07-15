@@ -136,11 +136,10 @@ latch_xy_goal_tolerance: true
 - 等待并完成 AMCL 初始化后再开始任务。
 - 按 YAML 中定义的任务和 waypoint 顺序逐点执行。
 - 对尚未满足的 waypoint，在发目标前调用 clear-costmaps，清理可能残留的代价地图状态。
-- 发送目标前 precheck 当前 AMCL 位姿；若 XY 和 yaw 均已在容差内，则跳过该点。
+- 发送 goal 前 precheck 当前 AMCL 位姿；若已满足 XY/yaw 容差，则直接跳过 goal 并将该 waypoint 判定为成功。
 - waypoint 超时时先读取 action state，再 cancel 目标，避免取消动作覆盖真实终态。
 - 对非成功状态输出 action state、当前/目标位姿和最终误差等诊断信息。
-- 以 `move_base SUCCEEDED` 作为 waypoint 的最终成功标准。
-- AMCL 的 XY/yaw 误差只用于摘要和诊断，不替代 action 成功状态。
+- 已发送 goal 时，以 `move_base` action 返回 `SUCCEEDED` 为成功标准；`SUCCEEDED` 后的 AMCL XY/yaw 误差只记录摘要和诊断，不再推翻成功。
 - 任一 waypoint 失败后立即 fail-fast，不继续执行后续任务。
 
 ## 4. 五项位姿任务与验收结果
@@ -252,6 +251,6 @@ python -m unittest discover -s tests -v
 - Task 1、Task 2 只定义业务起点和终点，由全局规划器选择路线。
 - Task 3 使用三个长柜台点：`long_counter_left`、`long_counter_middle`、`long_counter_right`。
 - Task 4、Task 5 使用完整位姿中转点，强制机器人通过指定区域。
-- `move_base SUCCEEDED` 是最终成功标准；AMCL 误差只用于记录和诊断。
+- waypoint 有两条成功路径：precheck 已满足 XY/yaw 容差时直接跳过 goal 并成功；已发送 goal 时，以 `move_base` action 返回 `SUCCEEDED` 为成功标准，之后的 AMCL 误差只记录摘要和诊断，不再推翻成功。
 - 当前窄通道参数服务于仿真通行性，不可直接作为真实机器人安全参数。
 - world、地图、导航参数、机器人尺寸、waypoint，以及 runner、launch、定位/传感器配置或依赖发生行为性变化时，应重新执行完整五任务回归；是否重新调参以运行证据为准。
