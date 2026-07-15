@@ -86,7 +86,10 @@ class RobotOptimizationConfigTest(unittest.TestCase):
 
         self.assertFalse(dwa["DWAPlannerROS"]["publish_traj_pc"])
         self.assertFalse(dwa["DWAPlannerROS"]["publish_cost_grid_pc"])
-        self.assertEqual(0.15, dwa["DWAPlannerROS"]["xy_goal_tolerance"])
+        # Task 3 stopped 0.165 m from its service goal and then hit move_base
+        # oscillation recovery. Keep DWA's completion radius above that
+        # observed terminal error while remaining tighter than the task runner.
+        self.assertEqual(0.18, dwa["DWAPlannerROS"]["xy_goal_tolerance"])
         self.assertEqual(0.20, dwa["DWAPlannerROS"]["yaw_goal_tolerance"])
         self.assertEqual(0.05, dwa["DWAPlannerROS"]["min_vel_theta"])
 

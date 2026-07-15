@@ -25,7 +25,10 @@ DWAPlannerROS:
   angular_sim_granularity: 0.025
 
   # Goal tolerances
-  xy_goal_tolerance: 0.15
+  # Task 3 reached 0.165 m from long_counter_left before move_base
+  # aborted on oscillation. Accept that safe terminal service radius instead
+  # of forcing a final 1.5 cm correction near the counter.
+  xy_goal_tolerance: 0.18
   yaw_goal_tolerance: 0.20
   latch_xy_goal_tolerance: true
 
