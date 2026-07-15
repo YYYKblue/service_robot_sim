@@ -103,9 +103,12 @@ inflation_radius = 0.26
 全局规划器当前使用：
 
 ```yaml
-use_grid_path: true
+use_grid_path: false
 default_tolerance: 0.20
 ```
+
+`use_grid_path: false` 使用 GlobalPlanner 默认的梯度回溯。栅格回溯在窄通道的等势区域可能循环并报出
+`NO PATH!`，即使势场计算已经确认目标可达。
 
 DWA 当前使用：
 

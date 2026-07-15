@@ -4,7 +4,9 @@ GlobalPlanner:
   visualize_potential: false
   use_dijkstra: true
   use_quadratic: true
-  use_grid_path: true
+  # GridPath may cycle on equal-potential cells during replanning in narrow
+  # corridors. Use the planner's default gradient traceback instead.
+  use_grid_path: false
   old_navfn_behavior: false
   orientation_mode: 1
   orientation_window_size: 1

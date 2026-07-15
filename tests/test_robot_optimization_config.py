@@ -109,7 +109,10 @@ class RobotOptimizationConfigTest(unittest.TestCase):
         self.assertEqual(12.0, costmap_common["inflation_layer"]["cost_scaling_factor"])
 
         self.assertEqual(0.20, global_planner["GlobalPlanner"]["default_tolerance"])
-        self.assertTrue(global_planner["GlobalPlanner"]["use_grid_path"])
+        self.assertFalse(
+            global_planner["GlobalPlanner"]["use_grid_path"],
+            "GridPath can loop on equal-potential cells and intermittently fail path extraction",
+        )
 
 
 if __name__ == "__main__":
