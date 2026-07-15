@@ -17,9 +17,9 @@ service_robot/
 │   └── world_to_map.py
 ├── src/
 │   ├── my_world/
-│   │   └── worlds/
-│   │       ├── indoor.world
-│   │       └── 平面图.png
+│   │   ├── worlds/
+│   │   │   └── indoor.world
+│   │   └── 平面图.png
 │   ├── service_robot_sim/
 │   │   └── launch/
 │   │       └── omni4_indoor.launch
@@ -28,13 +28,19 @@ service_robot/
 │   │   │   ├── sim_mapping.launch
 │   │   │   └── sim_navigation.launch
 │   │   ├── config/
+│   │   │   ├── costmap_common_params.yaml
+│   │   │   ├── global_planner_params.yaml
+│   │   │   ├── dwa_local_planner_params.yaml
 │   │   │   └── task_tests.yaml
 │   │   ├── maps/
+│   │   │   ├── indoor.pgm
+│   │   │   └── indoor.yaml
 │   │   └── scripts/
 │   │       ├── run_task_tests.py
 │   │       └── save_map.sh
-│   └── sweeper/
+│   └── sweeper_robot_omni4_base_ros/
 │       ├── urdf/
+│       │   └── sweeper_robot_omni4_base.urdf
 │       └── meshes/
 └── tests/
     ├── test_robot_optimization_config.py
@@ -45,13 +51,13 @@ service_robot/
 主要职责如下：
 
 - `scripts/world_to_map.py`：从 Gazebo world 几何生成导航地图。
-- `src/my_world/worlds/indoor.world`：当前室内仿真场景；同目录的 `平面图.png` 是场景平面图参考。
+- `src/my_world/worlds/indoor.world`：当前室内仿真场景；`src/my_world/平面图.png` 是场景平面图参考。
 - `src/service_robot_sim/launch/omni4_indoor.launch`：四全向轮机器人室内仿真入口。
 - `src/service_robot_navigation/launch/sim_mapping.launch` 与 `sim_navigation.launch`：建图和导航启动入口。
 - `src/service_robot_navigation/config/task_tests.yaml`：五项顺序任务及其完整位姿 waypoint。
 - `src/service_robot_navigation/maps/`：生成后的地图文件。
 - `src/service_robot_navigation/scripts/run_task_tests.py`：顺序任务测试 runner；`save_map.sh`：地图保存辅助脚本。
-- `src/sweeper/urdf/` 与 `src/sweeper/meshes/`：机器人模型和网格资源。
+- `src/sweeper_robot_omni4_base_ros/urdf/sweeper_robot_omni4_base.urdf` 与 `src/sweeper_robot_omni4_base_ros/meshes/`：机器人模型和网格资源。
 - `tests/` 下三个文件：覆盖模型/导航配置、任务 runner 配置和 world 几何的 Windows 本地静态回归。
 
 ## 2. Ubuntu 构建与运行
@@ -134,7 +140,7 @@ latch_xy_goal_tolerance: true
 - 对尚未满足的 waypoint，在发目标前调用 clear-costmaps，清理可能残留的代价地图状态。
 - 发送目标前 precheck 当前 AMCL 位姿；若 XY 和 yaw 均已在容差内，则跳过该点。
 - waypoint 超时时先读取 action state，再 cancel 目标，避免取消动作覆盖真实终态。
-- 对非成功状态输出 action state、status text 等诊断信息。
+- 对非成功状态输出 action state、当前/目标位姿和最终误差等诊断信息。
 - 以 `move_base SUCCEEDED` 作为 waypoint 的最终成功标准。
 - AMCL 的 XY/yaw 误差只用于摘要和诊断，不替代 action 成功状态。
 - 任一 waypoint 失败后立即 fail-fast，不继续执行后续任务。
