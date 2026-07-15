@@ -1,3 +1,5 @@
+import contextlib
+import io
 from pathlib import Path
 import importlib.util
 import unittest
@@ -159,6 +161,8 @@ class TaskTestRunnerConfigTest(unittest.TestCase):
         class FakeClient:
             def __init__(self):
                 self.cancelled = False
+                self.events = []
+                self.state = state
 
             def send_goal(self, goal):
                 pass
@@ -167,10 +171,13 @@ class TaskTestRunnerConfigTest(unittest.TestCase):
                 return finished
 
             def get_state(self):
-                return state
+                self.events.append("get_state")
+                return self.state
 
             def cancel_goal(self):
                 self.cancelled = True
+                self.events.append("cancel_goal")
+                self.state = 2
 
         class FakeRospy:
             Time = type("Time", (), {"now": staticmethod(lambda: 0.0)})
@@ -213,6 +220,7 @@ class TaskTestRunnerConfigTest(unittest.TestCase):
         self.assertTrue(fake_runner.client.cancelled)
         self.assertEqual(1, result["diagnostics"]["action_state"])
         self.assertEqual([1.25, 2.55, 1.3708], result["diagnostics"]["current_pose"])
+        self.assertEqual(["get_state", "cancel_goal"], fake_runner.client.events)
 
     def test_execute_waypoint_records_diagnostics_for_non_success_action_state(self):
         runner_module = load_runner_module()
@@ -232,6 +240,65 @@ class TaskTestRunnerConfigTest(unittest.TestCase):
         self.assertEqual(4, result["diagnostics"]["action_state"])
         self.assertEqual([1.25, 2.55, 1.3708], result["diagnostics"]["current_pose"])
         self.assertAlmostEqual(0.5, result["diagnostics"]["error"]["xy"], places=6)
+
+    def test_print_summary_keeps_diagnostics_on_failed_waypoint_lines_only(self):
+        runner = load_runner_module()
+        results = [
+            {
+                "name": "successful_task",
+                "success": True,
+                "duration": 0.1,
+                "waypoints": [
+                    {
+                        "name": "successful_waypoint",
+                        "success": True,
+                        "diagnostics": {"pose_error_message": "should not print"},
+                    }
+                ],
+            },
+            {
+                "name": "timeout_task",
+                "success": False,
+                "duration": 0.2,
+                "waypoints": [
+                    {
+                        "name": "timeout_waypoint",
+                        "success": False,
+                        "reason": "timeout after 1.0s",
+                    }
+                ],
+            },
+            {
+                "name": "diagnostic_task",
+                "success": False,
+                "duration": 0.3,
+                "waypoints": [
+                    {
+                        "name": "diagnostic_waypoint",
+                        "success": False,
+                        "reason": "move_base returned state 4",
+                        "diagnostics": {"pose_error_message": "amcl\nread failed"},
+                    }
+                ],
+            },
+        ]
+        output = io.StringIO()
+
+        with contextlib.redirect_stdout(output):
+            runner.print_summary(results)
+
+        lines = output.getvalue().splitlines()
+        successful_line = next(line for line in lines if "successful_waypoint" in line)
+        timeout_line = next(line for line in lines if "timeout_waypoint" in line)
+        diagnostic_lines = [line for line in lines if "diagnostic_waypoint" in line]
+
+        self.assertNotIn("diagnostics=", successful_line)
+        self.assertIn("reason=timeout after 1.0s", timeout_line)
+        self.assertNotIn("diagnostics=", timeout_line)
+        self.assertEqual(1, len(diagnostic_lines))
+        self.assertIn("diagnostics=", diagnostic_lines[0])
+        self.assertIn("pose_read_error=amcl read failed", diagnostic_lines[0])
+        self.assertNotIn("amcl\nread failed", output.getvalue())
 
     def test_execute_waypoint_records_diagnostics_for_success_state_with_pose_error(self):
         runner_module = load_runner_module()
