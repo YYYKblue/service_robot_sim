@@ -80,6 +80,36 @@ class TaskTestRunnerConfigTest(unittest.TestCase):
         self.assertTrue(runner.pose_within_tolerance((2.0, 8.05, 1.5708), [2.0, 8.05, 1.5708], 0.05, 0.05))
         self.assertFalse(runner.pose_within_tolerance((2.0, 8.05, 0.0), [2.0, 8.05, 1.5708], 0.05, 0.05))
 
+    def test_build_failure_diagnostics_includes_current_pose_and_error(self):
+        runner = load_runner_module()
+
+        diagnostics = runner.build_failure_diagnostics(
+            [1.55, 2.15, 1.5708],
+            1,
+            current_pose=(1.25, 2.55, 1.3708),
+        )
+
+        self.assertEqual([1.55, 2.15, 1.5708], diagnostics["target_pose"])
+        self.assertEqual(1, diagnostics["action_state"])
+        self.assertEqual([1.25, 2.55, 1.3708], diagnostics["current_pose"])
+        self.assertAlmostEqual(0.5, diagnostics["error"]["xy"], places=6)
+        self.assertAlmostEqual(0.2, diagnostics["error"]["yaw"], places=6)
+
+    def test_build_failure_diagnostics_includes_pose_error_message_without_pose(self):
+        runner = load_runner_module()
+
+        diagnostics = runner.build_failure_diagnostics(
+            [1.55, 2.15, 1.5708],
+            1,
+            pose_error_message="timed out waiting for /amcl_pose",
+        )
+
+        self.assertEqual([1.55, 2.15, 1.5708], diagnostics["target_pose"])
+        self.assertEqual(1, diagnostics["action_state"])
+        self.assertEqual("timed out waiting for /amcl_pose", diagnostics["pose_error_message"])
+        self.assertNotIn("current_pose", diagnostics)
+        self.assertNotIn("error", diagnostics)
+
     def test_runner_waits_for_amcl_pose_after_publishing_initial_pose(self):
         runner_module = load_runner_module()
 

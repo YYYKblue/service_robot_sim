@@ -44,6 +44,20 @@ def compute_pose_error(current_pose, target_pose):
     }
 
 
+def build_failure_diagnostics(target_pose, action_state, current_pose=None, pose_error_message=None):
+    diagnostics = {
+        "target_pose": [float(value) for value in target_pose],
+        "action_state": action_state,
+    }
+    if current_pose is not None:
+        current_pose = [float(value) for value in current_pose]
+        diagnostics["current_pose"] = current_pose
+        diagnostics["error"] = compute_pose_error(current_pose, diagnostics["target_pose"])
+    if pose_error_message is not None:
+        diagnostics["pose_error_message"] = str(pose_error_message)
+    return diagnostics
+
+
 def pose_within_tolerance(current_pose, target_pose, xy_tolerance, yaw_tolerance):
     error = compute_pose_error(current_pose, target_pose)
     return error["xy"] <= xy_tolerance and error["yaw"] <= yaw_tolerance
