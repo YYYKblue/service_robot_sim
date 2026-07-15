@@ -296,6 +296,13 @@ class TaskTestRunner:
         except Exception as exc:
             self.rospy.logwarn("Could not clear costmaps via %s: %s", self.clear_costmaps_service, exc)
 
+    def collect_failure_diagnostics(self, target_pose, action_state):
+        try:
+            current_pose = self.current_pose()
+            return build_failure_diagnostics(target_pose, action_state, current_pose=current_pose)
+        except Exception as exc:
+            return build_failure_diagnostics(target_pose, action_state, pose_error_message=exc)
+
     def execute_waypoint(self, waypoint):
         frame_id = get_setting(self.config, waypoint, "frame_id") or "map"
         timeout = float(get_setting(self.config, waypoint, "timeout") or 90.0)
@@ -327,12 +334,14 @@ class TaskTestRunner:
         self.client.send_goal(goal)
         finished = self.client.wait_for_result(self.rospy.Duration(timeout))
         if not finished:
+            state = self.client.get_state()
             self.client.cancel_goal()
             return {
                 "name": waypoint["name"],
                 "success": False,
                 "duration": time.time() - start,
                 "reason": "timeout after {:.1f}s".format(timeout),
+                "diagnostics": self.collect_failure_diagnostics(waypoint["pose"], state),
             }
 
         state = self.client.get_state()
@@ -342,6 +351,7 @@ class TaskTestRunner:
                 "success": False,
                 "duration": time.time() - start,
                 "reason": "move_base returned state {}".format(state),
+                "diagnostics": self.collect_failure_diagnostics(waypoint["pose"], state),
             }
 
         current_pose = self.current_pose()
@@ -353,6 +363,9 @@ class TaskTestRunner:
                 "duration": time.time() - start,
                 "reason": "pose error xy={:.3f}, yaw={:.3f}".format(error["xy"], error["yaw"]),
                 "error": error,
+                "diagnostics": build_failure_diagnostics(
+                    waypoint["pose"], state, current_pose=current_pose
+                ),
             }
 
         if hold_time > 0:

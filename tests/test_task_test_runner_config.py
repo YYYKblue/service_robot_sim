@@ -110,6 +110,87 @@ class TaskTestRunnerConfigTest(unittest.TestCase):
         self.assertNotIn("current_pose", diagnostics)
         self.assertNotIn("error", diagnostics)
 
+    def test_execute_waypoint_timeout_includes_cancelled_action_and_pose_diagnostics(self):
+        runner_module = load_runner_module()
+
+        class FakeGoal:
+            def __init__(self):
+                self.target_pose = type(
+                    "TargetPose",
+                    (),
+                    {
+                        "header": type("Header", (), {"frame_id": "", "stamp": None})(),
+                        "pose": type(
+                            "Pose",
+                            (),
+                            {
+                                "position": type("Position", (), {"x": 0.0, "y": 0.0, "z": 0.0})(),
+                                "orientation": type("Orientation", (), {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0})(),
+                            },
+                        )(),
+                    },
+                )()
+
+        class FakeClient:
+            def __init__(self):
+                self.cancelled = False
+
+            def send_goal(self, goal):
+                pass
+
+            def wait_for_result(self, timeout):
+                return False
+
+            def get_state(self):
+                return 1
+
+            def cancel_goal(self):
+                self.cancelled = True
+
+        class FakeRospy:
+            Time = type("Time", (), {"now": staticmethod(lambda: 0.0)})
+
+            def Duration(self, timeout):
+                return timeout
+
+            def loginfo(self, *args):
+                pass
+
+            def logwarn(self, *args):
+                pass
+
+        fake_runner = object.__new__(runner_module.TaskTestRunner)
+        fake_runner.config = {"defaults": {"timeout": 1.0}}
+        fake_runner.goal_cls = FakeGoal
+        fake_runner.goal_status_cls = type("GoalStatus", (), {"SUCCEEDED": 3})
+        fake_runner.client = FakeClient()
+        fake_runner.rospy = FakeRospy()
+        fake_runner.clear_costmaps = lambda: None
+        fake_runner.current_pose = lambda: (1.25, 2.55, 1.3708)
+
+        result = fake_runner.execute_waypoint(
+            {"name": "counter", "pose": [1.55, 2.15, 1.5708]}
+        )
+
+        self.assertFalse(result["success"])
+        self.assertIn("timeout", result["reason"])
+        self.assertTrue(fake_runner.client.cancelled)
+        self.assertEqual(1, result["diagnostics"]["action_state"])
+        self.assertEqual([1.25, 2.55, 1.3708], result["diagnostics"]["current_pose"])
+
+    def test_collect_failure_diagnostics_records_amcl_read_error(self):
+        runner_module = load_runner_module()
+        fake_runner = object.__new__(runner_module.TaskTestRunner)
+
+        def raise_pose_error():
+            raise RuntimeError("timed out waiting for /amcl_pose")
+
+        fake_runner.current_pose = raise_pose_error
+        diagnostics = fake_runner.collect_failure_diagnostics([1.55, 2.15, 1.5708], 1)
+
+        self.assertEqual(1, diagnostics["action_state"])
+        self.assertEqual("timed out waiting for /amcl_pose", diagnostics["pose_error_message"])
+
     def test_runner_waits_for_amcl_pose_after_publishing_initial_pose(self):
         runner_module = load_runner_module()
 
