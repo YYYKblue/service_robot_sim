@@ -84,10 +84,8 @@ roslaunch service_robot_navigation sim_navigation.launch
 ```bash
 cd ~/service_robot
 source devel/setup.bash
-rosrun service_robot_navigation run_task_tests.py
+python3 src/service_robot_navigation/scripts/run_task_tests.py
 ```
-
-也可以进入脚本目录后用 `python3` 直接运行 `run_task_tests.py`，但推荐使用 `rosrun`，以便沿用 catkin 工作区的包解析和可执行脚本入口。
 
 ## 3. 已完成的优化
 
@@ -171,7 +169,14 @@ src/my_world/worlds/indoor.world
 scripts/world_to_map.py
 ```
 
-推荐从项目根目录完整执行：
+`world_to_map.py` 依赖 Pillow。由于它是仓库根目录脚本，当前 `rosdep` 不会自动为它补齐该依赖，首次使用前先安装：
+
+```bash
+sudo apt update
+sudo apt install -y python3-pil
+```
+
+然后从项目根目录完整执行：
 
 ```bash
 cd ~/service_robot
@@ -199,9 +204,10 @@ python3 scripts/world_to_map.py \
 在 RViz 中重点观察：
 
 - `/map`
-- global costmap 与 local costmap
-- GlobalPlanner plan
-- DWA local plan
+- `/move_base/global_costmap/costmap`
+- `/move_base/local_costmap/costmap`
+- `/move_base/GlobalPlanner/plan`
+- `/move_base/DWAPlannerROS/local_plan`
 
 常用检查命令：
 
@@ -248,4 +254,4 @@ python -m unittest discover -s tests -v
 - Task 4、Task 5 使用完整位姿中转点，强制机器人通过指定区域。
 - `move_base SUCCEEDED` 是最终成功标准；AMCL 误差只用于记录和诊断。
 - 当前窄通道参数服务于仿真通行性，不可直接作为真实机器人安全参数。
-- 只有 world、map、导航参数、机器人尺寸或 waypoint 变化后，才需要重新开启调参与五项任务完整回归。
+- world、地图、导航参数、机器人尺寸、waypoint，以及 runner、launch、定位/传感器配置或依赖发生行为性变化时，应重新执行完整五任务回归；是否重新调参以运行证据为准。
