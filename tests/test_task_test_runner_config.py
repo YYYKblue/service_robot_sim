@@ -42,29 +42,38 @@ class TaskTestRunnerConfigTest(unittest.TestCase):
             task_names,
         )
 
+        expected_waypoints = {
+            "task_1_take_medicine_to_ward_a": ["take_medicine", "ward_a"],
+            "task_2_take_medicine_to_ward_b": ["take_medicine", "ward_b"],
+            "task_3_long_counter_service": [
+                "long_counter_left",
+                "long_counter_middle",
+                "long_counter_right",
+            ],
+            "task_4_staggered_channel": [
+                "staggered_entry",
+                "staggered_mid",
+                "staggered_exit",
+            ],
+            "task_5_narrow_area_to_dock": [
+                "narrow_entry",
+                "narrow_mid",
+                "narrow_exit",
+                "dock",
+            ],
+        }
+
         for task in config["tasks"]:
             self.assertGreaterEqual(len(task["waypoints"]), 1, task["name"])
+            self.assertEqual(
+                expected_waypoints[task["name"]],
+                [waypoint["name"] for waypoint in task["waypoints"]],
+            )
             for waypoint in task["waypoints"]:
                 self.assertEqual(3, len(waypoint["pose"]), waypoint["name"])
                 self.assertIsInstance(waypoint["pose"][2], (int, float))
 
-        self.assertEqual(2, len(config["tasks"][0]["waypoints"]))
-        self.assertGreaterEqual(len(config["tasks"][1]["waypoints"]), 6)
-        self.assertEqual(
-            [
-                "ward_a_door",
-                "staggered_exit",
-                "staggered_mid",
-                "staggered_entry",
-                "take_medicine",
-                "ward_b",
-            ],
-            [waypoint["name"] for waypoint in config["tasks"][1]["waypoints"]],
-        )
-        self.assertEqual(3, len(config["tasks"][2]["waypoints"]))
         self.assertEqual([3.05, 2.15, 1.5708], config["tasks"][2]["waypoints"][2]["pose"])
-        self.assertGreaterEqual(len(config["tasks"][3]["waypoints"]), 3)
-        self.assertGreaterEqual(len(config["tasks"][4]["waypoints"]), 4)
 
     def test_runner_loads_config_and_computes_pose_errors_without_ros(self):
         runner = load_runner_module()
