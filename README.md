@@ -65,6 +65,7 @@ service_robot/
 项目在 Ubuntu 20.04 + ROS Noetic 环境中构建：
 
 ```bash
+source /opt/ros/noetic/setup.bash
 cd ~/service_robot
 rosdep install --from-paths src --ignore-src -r -y
 catkin_make
