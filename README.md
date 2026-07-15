@@ -1,6 +1,6 @@
 # Service Robot ROS/Gazebo Project Handoff
 
-本项目是运行在 Ubuntu 20.04 + ROS Noetic + Gazebo 上的室内服务机器人仿真工程。当前机器人已经可以启动 Gazebo、建图、保存地图、导航，并具备一套按任务顺序执行的 Python 导航测试程序。后续主要工作不再是基础跑通，而是提升门框、狭窄通道、横向错位通道等临界区域的导航稳定性。
+本项目是运行在 Ubuntu 20.04 + ROS Noetic + Gazebo 上的室内服务机器人仿真工程。当前机器人已经可以启动 Gazebo、建图、保存地图、导航，并具备一套按任务顺序执行的 Python 导航测试程序。2026-07-15 的最新完整脚本运行中，Task 1、Task 2 已通过，Task 3 在长柜台第一个服务点超时，Task 4、Task 5 因 fail-fast 尚未执行。后续重点是定位 Task 3 的局部规划瓶颈，然后完成剩余任务回归。
 
 ## 1. 工作区结构
 
@@ -149,14 +149,22 @@ task_5_narrow_area_to_dock
 
 最新测试观察：
 
-- Task 1 已经能够通过。
-- Task 2 从病房 A 返回取药台时，曾在横向错位通道拐角处卡死；之后已将 task2 拆成多个中途点：
+- `use_grid_path: false` 已在 Gazebo runtime 中生效。此前反复出现的
+  `Failed to get a plan from potential when a legal potential was found` / `NO PATH!`
+  在本轮脚本测试中未再出现。
+- AMCL 初始化已验证：本轮初始位姿收敛误差为 `xy=0.004 m`、`yaw=0.002 rad`。
+- Task 1 通过：取药点到病房 A。
+- Task 2 通过：以下 6 个 waypoint 全部成功：
 
 ```text
 ward_a_door -> staggered_exit -> staggered_mid -> staggered_entry -> take_medicine -> ward_b
 ```
 
-是否完全稳定仍需要后续继续实机仿真验证。
+- Task 3 在第一个 waypoint `long_counter_left [1.55, 2.15, 1.5708]` 等待
+  `90.0 s` 后超时。
+- Task 4、Task 5 未执行；脚本在 Task 3 失败后按 fail-fast 规则结束。
+- 本轮结果是 `2/3` 个已执行任务通过，不能写成 `2/5` 全量任务通过。
+- Task 1、Task 2 目前只有本轮成功证据，仍需至少再做两次连续回归来判断稳定性。
 
 关键文件：
 
@@ -165,36 +173,109 @@ src/service_robot_navigation/config/task_tests.yaml
 src/service_robot_navigation/scripts/run_task_tests.py
 ```
 
-## 4. 当前主要问题
+## 4. 当前主要问题：Task 3 局部规划超时
 
-多轮测试显示，机器人在经过门框、横向错位通道、狭窄区域时仍容易出现：
+本轮日志没有再次出现全局规划器的 `NO PATH!`。当前失败表现为：
 
 ```text
-NO PATH!
-Failed to get a plan from potential when a legal potential was found.
-move_base returned state 4
+Sending waypoint: long_counter_left -> [1.55, 2.15, 1.5708]
+Task task_3_long_counter_service failed at waypoint long_counter_left:
+timeout after 90.0s
 ```
 
-已经确认：
+### 4.1 目标点本身不是最窄位置
 
-- 单纯轻量化模型解决了卡顿，但不解决窄通道规划失败。
-- 单纯把 gmapping 毛刺地图换成更干净的 PGM/YAML，效果仍然一般。
-- 失败点通常位于门框、拐角、高代价包围区域。
-- 任务点或中途点如果太靠近障碍，也会导致规划失败。
+根据 `indoor.world` 碰撞几何计算：
 
-目前判断：根因不只是地图毛刺，而是 Gazebo world 中部分门框、通道、拐角本身对 0.5 m 直径机器人来说余量偏小。全向轮能改善局部运动自由度，但 `move_base` 的全局规划仍然基于 2D costmap。如果 costmap 认为中心线不连续，全向轮也无法强行通过。
+```text
+long_counter_left 中心:       [1.55, 2.15]
+long_tabble 下边缘:            y = 2.60
+中心到柜台碰撞体距离:          0.45 m
+扣除 robot_radius=0.25 后间隙: 0.20 m
+超出 inflation_radius=0.26:   0.19 m
+```
+
+因此“目标中心已经落入障碍或致命膨胀层”与当前静态几何不符。截图中机器人也已经接近长柜台左服务点，不能仅凭超时把目标点判定为不可达。
+
+### 4.2 从病房 B 离开时存在更危险的瓶颈
+
+Task 2 结束于 `ward_b [5.15, 2.4]`。Task 3 前往长柜台时必须绕过病房 B 左墙底端：
+
+```text
+B_left 底端:       y = 1.75
+B_bottom 上沿:     y = 1.10
+两者垂直净口:      0.65 m
+机器人直径:        0.50 m
+理论居中外壳余量:  每侧约 0.075 m
+```
+
+对当前 PGM 做 `0.25 m` 车体半径膨胀后的静态 A* 检查，路径仍连通，但最窄采样点约为：
+
+```text
+[4.225, 1.525]
+机器人中心到 B_left: 约 0.257 m
+扣除车体半径后余量:   约 0.007 m
+```
+
+PGM 栅格距离变换得到的最小中心净空约 `0.269 m`，也只有约 `0.019 m` 车体余量。连续几何与 5 cm 栅格存在量化差异，但两者都说明这段路线是临界通道。定位误差、激光标记或 DWA 连续轨迹检查都可能让静态全局路径可达、局部轨迹却暂时无解。
+
+### 4.3 两条警告的含义
+
+```text
+Clearing both costmaps outside a square (2.00m) large centered on the robot.
+```
+
+这是 `move_base` 在规划器或控制器持续失败后进入 costmap recovery 的结果，不是根因。该警告出现在仿真时间 `220.403 s`，位于 Task 3 执行期间，证明 Task 3 中至少触发过一次恢复行为。
+
+```text
+DWA planner failed to produce path.
+```
+
+表示当时 DWA 采样不到合法局部轨迹。不过给出的时间 `133.099 s` 位于本轮 Task 2，而不是 Task 3，不能直接作为 `long_counter_left` 失败的证据。
+
+### 4.4 仍未确认的分支
+
+当前脚本超时时只记录 `timeout`，没有记录超时瞬间的 AMCL 位姿、目标误差、action state 和 `/cmd_vel`。因此尚不能区分：
+
+1. 机器人主要耗时或卡在 `B_left` / `B_bottom` 临界净口。
+2. 机器人已到达 `long_counter_left` 附近，但没有进入 DWA 的 `0.15 m` XY 或 `0.20 rad` yaw 成功容差。
+3. 局部 costmap 中存在由激光层写入、静态 PGM 中没有的障碍。
+
+在取得这些运行时证据前，不应先移动 Task 3 目标点或继续大幅修改 DWA 参数。
 
 ## 5. 推荐的后续路线
 
-### 5.1 优先修改 Gazebo world 几何
+### 5.1 先复现并定位 Task 3
 
-下一步建议直接修改：
+下一次运行时，在 Task 3 卡住期间保存以下信息：
+
+```bash
+rostopic echo -n 1 /amcl_pose
+rostopic echo -n 1 /move_base/status
+rostopic echo -n 1 /cmd_vel
+rostopic echo -n 1 /move_base/DWAPlannerROS/local_plan
+```
+
+RViz 必须同时显示：
+
+```text
+/move_base/global_costmap/costmap
+/move_base/local_costmap/costmap
+/move_base/GlobalPlanner/plan
+/move_base/DWAPlannerROS/local_plan
+```
+
+重点截取两个位置：`B_left` 底端附近，以及 `long_counter_left` 最终停车位置。还需要保留触发 costmap recovery 前 10 秒的 `move_base` 终端日志。
+
+### 5.2 根据证据修改 Gazebo world 几何
+
+如果确认局部规划在病房 B 出口瓶颈失败，优先修改：
 
 ```text
 src/my_world/worlds/indoor.world
 ```
 
-目标是适当加大以下区域净宽：
+第一目标是把 `B_left` 底端和 `B_bottom` 上沿之间当前约 `0.65 m` 的净口扩大到至少 `0.85 m`。之后再处理以下尚未完成全量回归的区域：
 
 - 病房 A/B 门框。
 - 横向错位通道拐角。
@@ -270,7 +351,7 @@ src/my_world/worlds/indoor.world
   service_7
 ```
 
-### 5.2 修改 world 后重新生成导航地图
+### 5.3 修改 world 后重新生成导航地图
 
 不要再优先用 gmapping 反推地图。当前项目已有 world 转地图脚本：
 
@@ -311,7 +392,7 @@ origin: [-0.25, -0.25, 0.0]
 
 这比绝对路径更适合交接和换机器。
 
-### 5.3 修改任务点
+### 5.4 修改任务点
 
 修改 world 几何后，必须重新核对：
 
@@ -389,22 +470,27 @@ python -m unittest discover -s tests -v
 - `task_tests.yaml` 的任务顺序和 waypoint 结构。
 - `run_task_tests.py` 的纯 Python 工具函数。
 - ROS 运行依赖声明。
+- 横向错位通道墙体拐角连接关系。
+
+当前静态测试共 `10` 项。它们只检查仓库内容，不能替代 ROS/Gazebo 运行验证。
 
 ## 8. 接手时的优先级
 
 建议后续 agent 按以下顺序工作：
 
-1. 先不要继续大幅调整 navigation 参数。
-2. 修改 `indoor.world`，扩大门框、横向错位通道和狭窄区域的实际净宽。
-3. 用 `scripts/world_to_map.py` 重新生成 `indoor.pgm/yaml`。
-4. 在 RViz 检查 `/map` 与 `global_costmap`，确认关键通道没有被高代价区域封死。
-5. 微调 `task_tests.yaml` 中的 waypoint。
-6. 运行 `run_task_tests.py`，记录通过到第几个任务、失败 waypoint、`move_base` 状态码。
-7. 只有在 world 几何和地图确认合理后，再微调 `inflation_radius`、DWA、GlobalPlanner。
+1. 保持当前 `use_grid_path: false`，不要重新开启 GridPath。
+2. 复现 Task 3，记录超时瞬间位姿、目标误差、action state、`cmd_vel` 和局部路径。
+3. 判断失败发生在 `B_left` 底端瓶颈，还是发生在 `long_counter_left` 最终收敛阶段。
+4. 若是瓶颈，先扩大 `B_left` / `B_bottom` 净口，再同步生成 `indoor.pgm/yaml` 和 `src/my_world/平面图.png`。
+5. 若机器人已在目标附近，再检查 DWA 成功容差和目标 yaw；不要先用增加 90 秒 timeout 掩盖问题。
+6. Task 3 连续通过至少 3 次后，继续执行尚未验证的 Task 4、Task 5。
+7. 最终目标是五个任务连续完整通过至少 2 轮，并记录每轮 waypoint 误差与耗时。
 
 ## 9. 当前重要结论
 
 - 机器人直径 0.5 m，理论能通过 0.75 m 门，但每侧余量只有 12.5 cm；在栅格地图、costmap inflation、定位误差、局部规划误差叠加后，这是临界场景。
 - 全向轮提高的是局部运动能力，不会绕过全局 costmap 的可通行性判断。
-- 如果门框或拐角本身接近临界，最稳的方案是改 Gazebo world 几何，然后用 world 直接生成干净地图。
-- 当前项目已经具备测试框架；下一阶段应把主要精力放在地图几何与任务 waypoint 的协同优化上。
+- `use_grid_path: false` 已解决此前势场合法但 GridPath 回溯失败的 runtime 问题；不要把当前 Task 3 超时与旧 `NO PATH!` 混为同一故障。
+- `long_counter_left` 本身有约 `0.20 m` 外壳间隙，当前更值得怀疑的是从病房 B 离开时仅约 `0.65 m` 的几何净口，以及最终姿态是否满足 DWA 成功条件。
+- Task 1、Task 2 已在一轮脚本测试中通过；Task 3 未通过；Task 4、Task 5 仍无本轮运行结果。
+- 当前项目已经具备测试框架；下一阶段应先补齐 Task 3 的运行时证据，再做单变量修改和完整回归。
