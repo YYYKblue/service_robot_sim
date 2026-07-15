@@ -1,92 +1,78 @@
-# Task 3 Runtime Diagnostics Design
+# Task 3 运行时诊断设计
 
-## Goal
+## 目标
 
-Make a Task 3 timeout diagnosable from the task runner's terminal output, then
-use one ROS Noetic/Gazebo reproduction to select a single corrective branch.
-This change does not tune navigation parameters, move waypoints, or change the
-world geometry.
+让任务执行器在 Task 3 超时时能够从终端输出中定位故障，并通过一次
+ROS Noetic/Gazebo 复现选择唯一的后续修复分支。本次变更不调整导航参数、
+不移动 waypoint，也不修改 world 几何。
 
-## Current Evidence
+## 现有证据
 
-- The ordered task runner has completed Task 1 and Task 2 once.
-- Task 3 times out at `long_counter_left` after 90 seconds.
-- The earlier GlobalPlanner `NO PATH!` failure is no longer present with
-  `use_grid_path: false`.
-- On timeout, the runner currently reports only the duration. It cannot show
-  whether the robot is stuck near the hospital-B exit, near the service point,
-  or blocked by dynamic local-costmap observations.
+- 顺序任务执行器已完成过一次 Task 1 和 Task 2。
+- Task 3 在 `long_counter_left` 等待 90 秒后超时。
+- 使用 `use_grid_path: false` 后，之前的 GlobalPlanner `NO PATH!` 问题未再出现。
+- 目前超时时执行器只报告耗时，无法区分机器人是卡在病房 B 出口、已到服务点附近但
+  未收敛，还是被局部 costmap 的动态观测阻断。
 
-## Scope
+## 范围
 
-Modify `src/service_robot_navigation/scripts/run_task_tests.py` only to emit
-failure evidence for a waypoint that times out or reaches a non-success action
-state. The existing task order, timeout, costmap-clearing behavior, and
-fail-fast behavior remain unchanged.
+只修改 `src/service_robot_navigation/scripts/run_task_tests.py`：当 waypoint
+超时或 action 返回非成功状态时，输出失败诊断证据。现有任务顺序、超时配置、
+清理 costmap 的行为和 fail-fast 行为均保持不变。
 
-Add offline unit tests for every new pure-Python formatting/calculation helper.
-The ROS/Gazebo reproduction and its captured output are runtime verification,
-not a source-code change in this task.
+为新增的纯 Python 格式化/计算辅助函数补充离线单元测试。ROS/Gazebo 复现及其
+采集结果属于运行时验证，不是本次源码变更内容。
 
-## Runner Behavior
+## 执行器行为
 
-For each unsuccessful waypoint result, include a `diagnostics` object when the
-information can be obtained:
+每个失败 waypoint 的结果中，在能够获取时加入 `diagnostics` 对象：
 
-| Field | Source | Purpose |
+| 字段 | 来源 | 作用 |
 | --- | --- | --- |
-| `current_pose` | latest `/amcl_pose` | Locate the robot at failure. |
-| `target_pose` | waypoint configuration | Preserve the intended goal. |
-| `error` | existing pose-error calculation | Separate position from yaw convergence. |
-| `action_state` | `SimpleActionClient.get_state()` | Distinguish timeout from terminal action failure. |
-| `pose_error_message` | failed AMCL read, if any | Preserve missing-pose evidence without hiding the original failure. |
+| `current_pose` | 最新 `/amcl_pose` | 定位失败时机器人所在位置。 |
+| `target_pose` | waypoint 配置 | 保留原始目标位姿。 |
+| `error` | 现有位姿误差计算 | 分离位置收敛与朝向收敛问题。 |
+| `action_state` | `SimpleActionClient.get_state()` | 区分超时与终止 action 失败。 |
+| `pose_error_message` | 读取 AMCL 失败时的异常 | 保留位姿不可读证据，且不掩盖原始失败原因。 |
 
-The runner will obtain a fresh pose after a timeout, after cancelling the goal.
-If this read fails, it still returns the original timeout result and adds the
-exception text as diagnostic evidence. It must not turn a navigation timeout
-into an uncaught runner error.
+发生超时时，执行器会先取消 goal，再读取一次最新位姿。如果读取失败，仍返回原有的
+超时结果，并把异常文本放入诊断信息；不得把导航超时升级为未捕获的执行器异常。
 
-The console summary will print diagnostic fields for failed waypoints in a
-single readable line. Successful and already-satisfied waypoint output remains
-compact.
+控制台汇总对失败 waypoint 以单行、可读的形式打印诊断字段；成功和已满足的
+waypoint 保持现有的简洁输出。
 
-## Runtime Procedure
+## 运行时复现步骤
 
-In Ubuntu 20.04 with ROS Noetic, run the ordered task runner unchanged. During
-Task 3, capture `/amcl_pose`, `/move_base/status`, `/cmd_vel`, and
-`/move_base/DWAPlannerROS/local_plan`; in RViz display the global and local
-costmaps, global plan, and DWA local plan. Retain terminal logs from the ten
-seconds preceding any costmap recovery.
+在 Ubuntu 20.04 + ROS Noetic 环境中，以现有方式运行顺序任务执行器。Task 3
+执行期间采集 `/amcl_pose`、`/move_base/status`、`/cmd_vel` 和
+`/move_base/DWAPlannerROS/local_plan`；RViz 同时显示 global/local costmap、
+global plan 和 DWA local plan。若触发 costmap recovery，保留前 10 秒的终端日志。
 
-## Decision Rules
+## 决策规则
 
-1. If the final pose is near the `B_left`/`B_bottom` opening and the local plan
-   is absent or repeatedly rejected, widen that opening in `indoor.world`,
-   regenerate `indoor.pgm` and `indoor.yaml`, then retest.
-2. If the final pose is near `long_counter_left` but the reported XY or yaw
-   error remains above tolerance, inspect that waypoint's orientation and the
-   relevant DWA goal tolerances before changing geometry.
-3. If the static global route is open but the local costmap contains an
-   observation absent from the map, inspect the laser marking and clearing
-   behavior before changing either geometry or planner tolerances.
+1. 若最终位姿停在 `B_left`/`B_bottom` 开口附近，且局部路径缺失或持续被拒绝，
+   则扩大 `indoor.world` 的该开口，重新生成 `indoor.pgm` 和 `indoor.yaml` 后复测。
+2. 若最终位姿已接近 `long_counter_left`，但报告的 XY 或 yaw 误差仍超出容差，
+   则先检查该 waypoint 的朝向和相关 DWA 目标容差，再决定是否改变几何。
+3. 若静态全局路线连通，但局部 costmap 存在地图中没有的观测障碍，
+   则检查激光 marking/clearing 行为，不改几何也不改规划容差。
 
-No branch permits increasing the timeout merely to mask a non-convergent goal.
+任何分支都不得仅通过增加 timeout 掩盖无法收敛的目标。
 
-## Validation
+## 验证
 
-Before runtime reproduction:
+运行时复现前：
 
-1. Run `python -m unittest discover -s tests -v` from the repository root.
-2. Run `git diff --check`.
+1. 在仓库根目录执行 `python -m unittest discover -s tests -v`。
+2. 执行 `git diff --check`。
 
-After runtime reproduction, the result must include the failed waypoint's
-final pose (or explicit pose-read failure), goal error when available, action
-state, and the four requested ROS/RViz observations. Only then may the next
-change target world geometry, goal configuration, or costmap behavior.
+运行时复现后，结果必须包含失败 waypoint 的最终位姿（或明确的位姿读取失败）、
+可用的目标误差、action state，以及四项要求采集的 ROS/RViz 观测。只有获得这些
+证据后，后续改动才可以针对 world 几何、目标配置或 costmap 行为。
 
-## Non-Goals
+## 非目标
 
-- Re-enable `use_grid_path`.
-- Retune DWA or costmap parameters without new evidence.
-- Change `task_tests.yaml` waypoint positions or tolerances.
-- Modify `indoor.world` or regenerate the map in this diagnostic change.
+- 不重新启用 `use_grid_path`。
+- 不在缺少新证据时调整 DWA 或 costmap 参数。
+- 不修改 `task_tests.yaml` 的 waypoint 位置或容差。
+- 不修改 `indoor.world`，也不重新生成地图。
