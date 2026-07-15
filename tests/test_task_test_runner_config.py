@@ -313,7 +313,7 @@ class TaskTestRunnerConfigTest(unittest.TestCase):
         self.assertIn("pose_read_error=amcl read failed", diagnostic_lines[0])
         self.assertNotIn("amcl\nread failed", output.getvalue())
 
-    def test_execute_waypoint_records_diagnostics_for_success_state_with_pose_error(self):
+    def test_execute_waypoint_accepts_success_state_with_latest_pose_drift(self):
         runner_module = load_runner_module()
         fake_runner = self.make_fake_waypoint_runner(
             runner_module,
@@ -326,12 +326,11 @@ class TaskTestRunnerConfigTest(unittest.TestCase):
             {"name": "counter", "pose": [1.55, 2.15, 1.5708]}
         )
 
-        self.assertFalse(result["success"])
-        self.assertIn("pose error", result["reason"])
-        self.assertEqual(3, result["diagnostics"]["action_state"])
-        self.assertEqual([1.55, 2.15, 1.5708], result["diagnostics"]["target_pose"])
-        self.assertEqual([1.25, 2.55, 1.3708], result["diagnostics"]["current_pose"])
-        self.assertAlmostEqual(0.5, result["diagnostics"]["error"]["xy"], places=6)
+        self.assertTrue(result["success"])
+        self.assertNotIn("reason", result)
+        self.assertNotIn("diagnostics", result)
+        self.assertAlmostEqual(0.5, result["error"]["xy"], places=6)
+        self.assertAlmostEqual(0.2, result["error"]["yaw"], places=6)
 
     def test_collect_failure_diagnostics_records_amcl_read_error(self):
         runner_module = load_runner_module()

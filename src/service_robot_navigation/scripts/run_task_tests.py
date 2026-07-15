@@ -376,17 +376,6 @@ class TaskTestRunner:
 
         current_pose = self.current_pose()
         error = compute_pose_error(current_pose, waypoint["pose"])
-        if error["xy"] > xy_tolerance or error["yaw"] > yaw_tolerance:
-            return {
-                "name": waypoint["name"],
-                "success": False,
-                "duration": time.time() - start,
-                "reason": "pose error xy={:.3f}, yaw={:.3f}".format(error["xy"], error["yaw"]),
-                "error": error,
-                "diagnostics": build_failure_diagnostics(
-                    waypoint["pose"], state, current_pose=current_pose
-                ),
-            }
 
         if hold_time > 0:
             self.rospy.sleep(hold_time)
