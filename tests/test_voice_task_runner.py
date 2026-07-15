@@ -254,6 +254,26 @@ class VoiceProviderContractTest(unittest.TestCase):
             encoding="utf-8"
         )
         self.assertIn("scripts/tts_service_node.py", cmake)
+        self.assertIn("install(DIRECTORY config launch", cmake)
+
+        voice_cmake = (
+            ROOT / "src" / "voice_keyword_extractor" / "CMakeLists.txt"
+        ).read_text(encoding="utf-8")
+        self.assertIn("install(DIRECTORY config launch", voice_cmake)
+
+    def test_tts_provider_resolves_installed_config_and_declares_runtime_files(self):
+        node = (ROOT / "src" / "cloud_tts" / "scripts" / "tts_service_node.py").read_text(
+            encoding="utf-8"
+        )
+        package_xml = (ROOT / "src" / "cloud_tts" / "package.xml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("rospkg.RosPack", node)
+        self.assertIn("<exec_depend>rospkg</exec_depend>", package_xml)
+        self.assertIn("<exec_depend>python3-requests</exec_depend>", package_xml)
+        self.assertIn("<exec_depend>python3-yaml</exec_depend>", package_xml)
+        self.assertIn("dashscope", (ROOT / "src" / "cloud_tts" / "requirements.txt").read_text(encoding="utf-8"))
+        self.assertIn("openai", (ROOT / "src" / "voice_keyword_extractor" / "requirements.txt").read_text(encoding="utf-8"))
 
     def test_navigation_declares_rospkg_for_installed_config_lookup(self):
         package_xml = (

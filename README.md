@@ -121,6 +121,13 @@ python3 src/service_robot_navigation/scripts/run_voice_tasks.py --once
 
 脚本默认使用 5 秒录音、`/extract_keyword` 和 `/synthesize_speech`；可通过 `--record-seconds`、`--keyword-service` 和 `--tts-service` 覆盖。当前仓库已包含并安装 `keyword_service_node.py`，它会将语音转写结果映射为 `task1`～`task5`；运行前仍需配置该节点所需的录音设备、ASR/LLM API Key 和网络环境。
 
+首次配置语音节点时，在 Ubuntu 环境安装其非 ROS Python 依赖：
+
+```bash
+python3 -m pip install -r src/voice_keyword_extractor/requirements.txt
+python3 -m pip install -r src/cloud_tts/requirements.txt
+```
+
 ## 3. 已完成的优化
 
 ### 3.1 机器人模型

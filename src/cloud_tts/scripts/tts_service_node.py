@@ -32,8 +32,21 @@ class TtsError(RuntimeError):
 
 def load_config() -> Dict[str, Any]:
     """读取功能包内的 YAML 配置文件。"""
-    package_path = Path(__file__).resolve().parent.parent
-    config_path = package_path / "config" / "tts_config.yaml"
+    source_config_path = (
+        Path(__file__).resolve().parent.parent
+        / "config"
+        / "tts_config.yaml"
+    )
+    config_path = source_config_path
+
+    if not config_path.is_file():
+        try:
+            import rospkg
+
+            package_path = Path(rospkg.RosPack().get_path("cloud_tts"))
+            config_path = package_path / "config" / "tts_config.yaml"
+        except Exception:
+            config_path = source_config_path
 
     if not config_path.is_file():
         raise TtsError(
