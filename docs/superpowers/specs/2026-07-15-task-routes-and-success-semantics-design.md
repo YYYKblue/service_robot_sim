@@ -134,4 +134,3 @@ Ubuntu ROS/Gazebo 验收：
 - Task 4、5 仍强制通过各自指定区域。
 - action 返回 `SUCCEEDED` 时，测试摘要显示 waypoint 为 PASS，
   同时保留 XY/Yaw 误差用于观察。
-
