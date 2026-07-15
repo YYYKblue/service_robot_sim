@@ -64,7 +64,6 @@ class TaskTestRunnerConfigTest(unittest.TestCase):
         }
 
         for task in config["tasks"]:
-            self.assertGreaterEqual(len(task["waypoints"]), 1, task["name"])
             self.assertEqual(
                 expected_waypoints[task["name"]],
                 [waypoint["name"] for waypoint in task["waypoints"]],
@@ -73,6 +72,11 @@ class TaskTestRunnerConfigTest(unittest.TestCase):
                 self.assertEqual(3, len(waypoint["pose"]), waypoint["name"])
                 self.assertIsInstance(waypoint["pose"][2], (int, float))
 
+        task_2_waypoints = config["tasks"][1]["waypoints"]
+        self.assertEqual([2.0, 8.05, 1.5708], task_2_waypoints[0]["pose"])
+        self.assertEqual(2.0, task_2_waypoints[0]["hold_time"])
+        self.assertEqual([5.15, 2.4, 3.1416], task_2_waypoints[1]["pose"])
+        self.assertEqual(2.0, task_2_waypoints[1]["hold_time"])
         self.assertEqual([3.05, 2.15, 1.5708], config["tasks"][2]["waypoints"][2]["pose"])
 
     def test_runner_loads_config_and_computes_pose_errors_without_ros(self):
