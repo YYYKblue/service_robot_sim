@@ -88,6 +88,39 @@ source devel/setup.bash
 python3 src/service_robot_navigation/scripts/run_task_tests.py
 ```
 
+### 2.1 语音命令任务执行
+
+语音任务脚本复用上述 waypoint runner，但任务不再按 1～5 顺序执行，而是由 `voice_keyword_extractor` 返回的 `task1`～`task5` 触发。默认接口为：
+
+```text
+/extract_keyword       voice_keyword_extractor/ExtractKeyword
+/synthesize_speech     cloud_tts/SynthesizeSpeech
+```
+
+启动顺序：
+
+```bash
+# 终端 1：Gazebo、AMCL、move_base
+roslaunch service_robot_navigation sim_navigation.launch
+
+# 终端 2：云端 TTS 服务
+roslaunch cloud_tts cloud_tts.launch
+
+# 终端 3：启动能够提供 /extract_keyword 的语音识别节点
+# 该节点收到 start_recording=true 后录音，并在响应 keyword 中返回 task1～task5
+
+# 终端 4：持续等待语音任务命令
+python3 src/service_robot_navigation/scripts/run_voice_tasks.py
+```
+
+例如说“请去取药台取药并送至病房A”，识别服务返回 `task1` 后，脚本会播报准备信息，执行 `task_1_take_medicine_to_ward_a`，完成后播报结果。可用 `--once` 在识别并执行一条有效任务后退出：
+
+```bash
+python3 src/service_robot_navigation/scripts/run_voice_tasks.py --once
+```
+
+脚本默认使用 5 秒录音、`/extract_keyword` 和 `/synthesize_speech`；可通过 `--record-seconds`、`--keyword-service` 和 `--tts-service` 覆盖。当前仓库包含 `ExtractKeyword.srv` 和 `voice_keyword.launch` 接口骨架，但没有提交 `keyword_service_node.py` 的 ASR 实现；运行语音闭环前必须提供该节点。
+
 ## 3. 已完成的优化
 
 ### 3.1 机器人模型

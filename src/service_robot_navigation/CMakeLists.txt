@@ -7,6 +7,7 @@ catkin_package()
 install(PROGRAMS
   scripts/save_map.sh
   scripts/run_task_tests.py
+  scripts/run_voice_tasks.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
