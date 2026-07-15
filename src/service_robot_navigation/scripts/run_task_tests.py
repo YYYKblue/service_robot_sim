@@ -73,7 +73,8 @@ def format_failure_diagnostics(diagnostics):
         if "yaw" in error:
             fields.append("final_yaw={:.3f}".format(error["yaw"]))
     if "pose_error_message" in diagnostics:
-        fields.append("pose_read_error={}".format(diagnostics["pose_error_message"]))
+        message = " ".join(str(diagnostics["pose_error_message"]).split())
+        fields.append("pose_read_error={}".format(message))
     return " diagnostics={}".format(" ".join(fields))
 
 

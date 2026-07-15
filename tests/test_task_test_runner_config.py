@@ -130,9 +130,14 @@ class TaskTestRunnerConfigTest(unittest.TestCase):
         self.assertIn("final_yaw=0.200", result)
         self.assertIn("pose_read_error=amcl read failed", result)
 
-    def test_execute_waypoint_timeout_includes_cancelled_action_and_pose_diagnostics(self):
-        runner_module = load_runner_module()
+        newline_result = runner.format_failure_diagnostics(
+            {"pose_error_message": "amcl\nread failed"}
+        )
 
+        self.assertNotIn("\n", newline_result)
+        self.assertIn("pose_read_error=amcl read failed", newline_result)
+
+    def make_fake_waypoint_runner(self, runner_module, finished, state, poses):
         class FakeGoal:
             def __init__(self):
                 self.target_pose = type(
@@ -159,10 +164,10 @@ class TaskTestRunnerConfigTest(unittest.TestCase):
                 pass
 
             def wait_for_result(self, timeout):
-                return False
+                return finished
 
             def get_state(self):
-                return 1
+                return state
 
             def cancel_goal(self):
                 self.cancelled = True
@@ -186,7 +191,18 @@ class TaskTestRunnerConfigTest(unittest.TestCase):
         fake_runner.client = FakeClient()
         fake_runner.rospy = FakeRospy()
         fake_runner.clear_costmaps = lambda: None
-        fake_runner.current_pose = lambda: (1.25, 2.55, 1.3708)
+        pose_values = iter(poses)
+        fake_runner.current_pose = lambda: next(pose_values)
+        return fake_runner
+
+    def test_execute_waypoint_timeout_includes_cancelled_action_and_pose_diagnostics(self):
+        runner_module = load_runner_module()
+        fake_runner = self.make_fake_waypoint_runner(
+            runner_module,
+            finished=False,
+            state=1,
+            poses=[(1.25, 2.55, 1.3708), (1.25, 2.55, 1.3708)],
+        )
 
         result = fake_runner.execute_waypoint(
             {"name": "counter", "pose": [1.55, 2.15, 1.5708]}
@@ -197,6 +213,45 @@ class TaskTestRunnerConfigTest(unittest.TestCase):
         self.assertTrue(fake_runner.client.cancelled)
         self.assertEqual(1, result["diagnostics"]["action_state"])
         self.assertEqual([1.25, 2.55, 1.3708], result["diagnostics"]["current_pose"])
+
+    def test_execute_waypoint_records_diagnostics_for_non_success_action_state(self):
+        runner_module = load_runner_module()
+        fake_runner = self.make_fake_waypoint_runner(
+            runner_module,
+            finished=True,
+            state=4,
+            poses=[(1.25, 2.55, 1.3708), (1.25, 2.55, 1.3708)],
+        )
+
+        result = fake_runner.execute_waypoint(
+            {"name": "counter", "pose": [1.55, 2.15, 1.5708]}
+        )
+
+        self.assertFalse(result["success"])
+        self.assertEqual("move_base returned state 4", result["reason"])
+        self.assertEqual(4, result["diagnostics"]["action_state"])
+        self.assertEqual([1.25, 2.55, 1.3708], result["diagnostics"]["current_pose"])
+        self.assertAlmostEqual(0.5, result["diagnostics"]["error"]["xy"], places=6)
+
+    def test_execute_waypoint_records_diagnostics_for_success_state_with_pose_error(self):
+        runner_module = load_runner_module()
+        fake_runner = self.make_fake_waypoint_runner(
+            runner_module,
+            finished=True,
+            state=3,
+            poses=[(0.0, 0.0, 0.0), (1.25, 2.55, 1.3708)],
+        )
+
+        result = fake_runner.execute_waypoint(
+            {"name": "counter", "pose": [1.55, 2.15, 1.5708]}
+        )
+
+        self.assertFalse(result["success"])
+        self.assertIn("pose error", result["reason"])
+        self.assertEqual(3, result["diagnostics"]["action_state"])
+        self.assertEqual([1.55, 2.15, 1.5708], result["diagnostics"]["target_pose"])
+        self.assertEqual([1.25, 2.55, 1.3708], result["diagnostics"]["current_pose"])
+        self.assertAlmostEqual(0.5, result["diagnostics"]["error"]["xy"], places=6)
 
     def test_collect_failure_diagnostics_records_amcl_read_error(self):
         runner_module = load_runner_module()
