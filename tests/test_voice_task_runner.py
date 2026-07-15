@@ -223,5 +223,44 @@ class VoiceTaskPackagingTest(unittest.TestCase):
         self.assertTrue(args.once)
 
 
+class VoiceProviderContractTest(unittest.TestCase):
+    def test_keyword_provider_matches_task_service_contract(self):
+        node = (
+            ROOT
+            / "src"
+            / "voice_keyword_extractor"
+            / "scripts"
+            / "keyword_service_node.py"
+        ).read_text(encoding="utf-8")
+        vocabulary = (
+            ROOT
+            / "src"
+            / "voice_keyword_extractor"
+            / "config"
+            / "vocabulary.yaml"
+        ).read_text(encoding="utf-8")
+        cmake = (
+            ROOT / "src" / "voice_keyword_extractor" / "CMakeLists.txt"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn('rospy.Service(\n        "/extract_keyword"', node)
+        for task_id in ("task1", "task2", "task3", "task4", "task5"):
+            self.assertIn(task_id, node)
+            self.assertIn("- {}".format(task_id), vocabulary)
+        self.assertIn("scripts/keyword_service_node.py", cmake)
+
+    def test_tts_provider_installs_launch_target(self):
+        cmake = (ROOT / "src" / "cloud_tts" / "CMakeLists.txt").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("scripts/tts_service_node.py", cmake)
+
+    def test_navigation_declares_rospkg_for_installed_config_lookup(self):
+        package_xml = (
+            ROOT / "src" / "service_robot_navigation" / "package.xml"
+        ).read_text(encoding="utf-8")
+        self.assertIn("<exec_depend>rospkg</exec_depend>", package_xml)
+
+
 if __name__ == "__main__":
     unittest.main()

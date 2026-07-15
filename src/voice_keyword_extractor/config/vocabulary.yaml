@@ -1,13 +1,15 @@
 allowed_keywords:
-  - coke
-  - medicine
-  - water
-  - milk
+  - task1
+  - task2
+  - task3
+  - task4
+  - task5
   - unknown
 
 descriptions:
-  coke: 可乐、汽水、可口可乐
-  medicine: 药、药品、药物
-  water: 水、饮用水、矿泉水
-  milk: 牛奶
+  task1: 请去取药台取药并送至病房A
+  task2: 请去取药台取药并送至病房B
+  task3: 请在长柜台服务区依次服务三个人
+  task4: 请去横向错位通道进行测试
+  task5: 请通过狭窄区域到停靠点
   unknown: 无法确定或不属于以上类别

@@ -17,10 +17,11 @@ from voice_keyword_extractor.srv import (
 
 
 ALLOWED_KEYWORDS = {
-    "coke",
-    "medicine",
-    "water",
-    "milk",
+    "task1",
+    "task2",
+    "task3",
+    "task4",
+    "task5",
     "unknown",
 }
 
@@ -29,22 +30,24 @@ AUDIO_PATH = "/tmp/voice_keyword.wav"
 SYSTEM_PROMPT = """
 你是 RoboCup 家庭服务机器人的关键词提取模块。
 
-请根据用户说的话，只从下面五个英文关键词中返回一个：
-coke
-medicine
-water
-milk
+请根据用户说的话，只从下面五个任务编号中返回一个：
+task1
+task2
+task3
+task4
+task5
 unknown
 
 映射规则：
-1. 可乐、汽水、可口可乐、一杯可乐、一瓶可乐 -> coke
-2. 药、药品、药物、吃药、拿药 -> medicine
-3. 水、饮用水、矿泉水、一杯水、一瓶水 -> water
-4. 牛奶、一盒牛奶、一杯牛奶 -> milk
-5. 其他物品、没有明确表达需求、无法理解 -> unknown
+1. 请去取药台取药并送至病房A、去药台给病房A送药 -> task1
+2. 请去取药台取药并送至病房B、去药台给病房B送药 -> task2
+3. 请在长柜台服务区依次服务三个人、去长柜台依次服务三个人 -> task3
+4. 请去横向错位通道进行测试、测试横向错位通道 -> task4
+5. 请通过狭窄区域到停靠点、经过狭窄区域去停靠点 -> task5
+6. 其他内容、没有明确表达任务、无法理解 -> unknown
 
 输出规则：
-1. 只输出一个英文关键词。
+1. 只输出一个任务编号。
 2. 不要输出解释。
 3. 不要输出标点。
 4. 不要输出 Markdown。
@@ -368,13 +371,13 @@ def main() -> None:
     rospy.init_node("keyword_service_node")
 
     rospy.Service(
-        "/extract_voice_keyword",
+        "/extract_keyword",
         ExtractKeyword,
         handle_extract_keyword,
     )
 
     rospy.loginfo(
-        "Real service /extract_voice_keyword is ready."
+        "Real service /extract_keyword is ready."
     )
 
     rospy.spin()

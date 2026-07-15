@@ -119,7 +119,7 @@ python3 src/service_robot_navigation/scripts/run_voice_tasks.py
 python3 src/service_robot_navigation/scripts/run_voice_tasks.py --once
 ```
 
-脚本默认使用 5 秒录音、`/extract_keyword` 和 `/synthesize_speech`；可通过 `--record-seconds`、`--keyword-service` 和 `--tts-service` 覆盖。当前仓库包含 `ExtractKeyword.srv` 和 `voice_keyword.launch` 接口骨架，但没有提交 `keyword_service_node.py` 的 ASR 实现；运行语音闭环前必须提供该节点。
+脚本默认使用 5 秒录音、`/extract_keyword` 和 `/synthesize_speech`；可通过 `--record-seconds`、`--keyword-service` 和 `--tts-service` 覆盖。当前仓库已包含并安装 `keyword_service_node.py`，它会将语音转写结果映射为 `task1`～`task5`；运行前仍需配置该节点所需的录音设备、ASR/LLM API Key 和网络环境。
 
 ## 3. 已完成的优化
 

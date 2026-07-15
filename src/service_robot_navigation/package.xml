@@ -27,4 +27,5 @@
   <exec_depend>service_robot_sim</exec_depend>
   <exec_depend>voice_keyword_extractor</exec_depend>
   <exec_depend>cloud_tts</exec_depend>
+  <exec_depend>rospkg</exec_depend>
 </package>
