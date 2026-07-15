@@ -58,6 +58,25 @@ def build_failure_diagnostics(target_pose, action_state, current_pose=None, pose
     return diagnostics
 
 
+def format_failure_diagnostics(diagnostics):
+    fields = []
+    if "action_state" in diagnostics:
+        fields.append("action_state={}".format(diagnostics["action_state"]))
+    if "current_pose" in diagnostics:
+        fields.append("current_pose=({:.3f},{:.3f},{:.3f})".format(*diagnostics["current_pose"]))
+    if "target_pose" in diagnostics:
+        fields.append("target_pose=({:.3f},{:.3f},{:.3f})".format(*diagnostics["target_pose"]))
+    if "error" in diagnostics:
+        error = diagnostics["error"]
+        if "xy" in error:
+            fields.append("final_xy={:.3f}".format(error["xy"]))
+        if "yaw" in error:
+            fields.append("final_yaw={:.3f}".format(error["yaw"]))
+    if "pose_error_message" in diagnostics:
+        fields.append("pose_read_error={}".format(diagnostics["pose_error_message"]))
+    return " diagnostics={}".format(" ".join(fields))
+
+
 def pose_within_tolerance(current_pose, target_pose, xy_tolerance, yaw_tolerance):
     error = compute_pose_error(current_pose, target_pose)
     return error["xy"] <= xy_tolerance and error["yaw"] <= yaw_tolerance
@@ -393,6 +412,8 @@ def print_summary(results):
                 detail = " xy={xy:.3f} yaw={yaw:.3f}".format(**waypoint["error"])
             if not waypoint["success"]:
                 detail += " reason={}".format(waypoint["reason"])
+                if "diagnostics" in waypoint:
+                    detail += format_failure_diagnostics(waypoint["diagnostics"])
             print("  - {} {}{}".format(waypoint_status, waypoint["name"], detail))
 
 

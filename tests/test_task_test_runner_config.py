@@ -110,6 +110,26 @@ class TaskTestRunnerConfigTest(unittest.TestCase):
         self.assertNotIn("current_pose", diagnostics)
         self.assertNotIn("error", diagnostics)
 
+    def test_format_failure_diagnostics_includes_all_available_fields(self):
+        runner = load_runner_module()
+
+        result = runner.format_failure_diagnostics(
+            {
+                "action_state": 1,
+                "current_pose": [1.25, 2.55, 1.3708],
+                "target_pose": [1.55, 2.15, 1.5708],
+                "error": {"xy": 0.5, "yaw": 0.2},
+                "pose_error_message": "amcl read failed",
+            }
+        )
+
+        self.assertIn("action_state=1", result)
+        self.assertIn("current_pose=(1.250,2.550,1.371)", result)
+        self.assertIn("target_pose=(1.550,2.150,1.571)", result)
+        self.assertIn("final_xy=0.500", result)
+        self.assertIn("final_yaw=0.200", result)
+        self.assertIn("pose_read_error=amcl read failed", result)
+
     def test_execute_waypoint_timeout_includes_cancelled_action_and_pose_diagnostics(self):
         runner_module = load_runner_module()
 
