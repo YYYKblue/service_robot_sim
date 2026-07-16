@@ -127,13 +127,16 @@ class VoiceTaskControllerTest(unittest.TestCase):
         }
         self.keyword_requests = []
         self.tts_requests = []
+        self.events = []
 
         def keyword_client(request):
             self.keyword_requests.append(request)
+            self.events.append(("keyword", request))
             return FakeKeywordResponse()
 
         def tts_client(request):
             self.tts_requests.append(request)
+            self.events.append(("tts", request))
             return FakeTtsResponse()
 
         self.keyword_client = keyword_client
@@ -160,8 +163,29 @@ class VoiceTaskControllerTest(unittest.TestCase):
         self.assertTrue(self.keyword_requests[0].start_recording)
         self.assertEqual(self.keyword_requests[0].record_seconds, 4.0)
         self.assertTrue(self.tts_requests[0].play_audio)
-        self.assertIn("准备执行任务1", self.tts_requests[0].text)
-        self.assertIn("任务1已完成", self.tts_requests[1].text)
+        self.assertIn("你需要我执行什么任务", self.tts_requests[0].text)
+        self.assertIn("准备执行任务1", self.tts_requests[1].text)
+        self.assertIn("任务1已完成", self.tts_requests[2].text)
+
+    def test_execute_once_prompts_before_recording_command(self):
+        controller = self.make_controller({"success": True})
+        controller.execute_once()
+        self.assertEqual(self.events[0][0], "tts")
+        self.assertEqual(self.events[0][1].text, "你需要我执行什么任务？")
+        self.assertEqual(self.events[1][0], "keyword")
+
+    def test_failed_keyword_response_speaks_recognition_failure(self):
+        def keyword_client(request):
+            self.events.append(("keyword", request))
+            return FakeKeywordResponse(
+                success=False,
+                error_message="ASR request failed",
+            )
+
+        controller = self.make_controller({"success": True})
+        controller.keyword_client = keyword_client
+        self.assertIsNone(controller.execute_once())
+        self.assertIn("语音识别失败", self.tts_requests[-1].text)
 
     def test_unknown_command_does_not_execute_navigation(self):
         def keyword_client(request):

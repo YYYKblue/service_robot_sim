@@ -119,6 +119,7 @@ class VoiceTaskController:
             self.rospy.logwarn("TTS service call failed: %s", error)
 
     def execute_once(self):
+        self.speak("你需要我执行什么任务？")
         request = self.keyword_request_factory()
         request.start_recording = True
         request.record_seconds = self.record_seconds
@@ -126,10 +127,18 @@ class VoiceTaskController:
             response = self.keyword_client(request)
         except Exception as error:
             self.rospy.logwarn("Keyword service call failed: %s", error)
-            self.speak("语音服务暂不可用，请稍后重试。")
+            self.speak("语音识别服务未启动，请检查语音节点。")
             return None
 
-        task_id = normalize_task_id(response.keyword) if response.success else None
+        if not response.success:
+            self.rospy.logwarn(
+                "Keyword recognition failed: %s",
+                getattr(response, "error_message", ""),
+            )
+            self.speak("语音识别失败，请重新说一遍。")
+            return None
+
+        task_id = normalize_task_id(response.keyword)
         if task_id is None or task_id not in self.tasks:
             self.rospy.logwarn(
                 "No valid task from keyword response: keyword=%s error=%s",

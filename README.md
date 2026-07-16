@@ -119,6 +119,8 @@ python3 src/service_robot_navigation/scripts/run_voice_tasks.py
 python3 src/service_robot_navigation/scripts/run_voice_tasks.py --once
 ```
 
+脚本进入等待状态后，会先播报“你需要我执行什么任务？”，听到这句话后再说任务指令。若识别节点没有启动，会播报“语音识别服务未启动，请检查语音节点。”；若识别请求失败，会播报“语音识别失败，请重新说一遍。”。
+
 脚本默认使用 5 秒录音、`/extract_keyword` 和 `/synthesize_speech`；可通过 `--record-seconds`、`--keyword-service` 和 `--tts-service` 覆盖。当前仓库已包含并安装 `keyword_service_node.py`，它会将语音转写结果映射为 `task1`～`task5`；运行前仍需配置该节点所需的录音设备、ASR/LLM API Key 和网络环境。
 
 首次配置语音节点时，在 Ubuntu 环境安装其非 ROS Python 依赖：
