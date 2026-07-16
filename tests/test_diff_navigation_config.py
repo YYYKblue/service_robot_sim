@@ -124,6 +124,33 @@ class DifferentialNavigationContractTest(unittest.TestCase):
         self.assertEqual("0.3960", drive.findtext("wheelSeparation"))
         self.assertEqual("0.1360", drive.findtext("wheelDiameter"))
 
+    def test_diff_model_has_hidden_symmetric_low_friction_pitch_supports(self):
+        supports = {
+            "front_passive_support": "0.1800 0 0.0250",
+            "rear_passive_support": "-0.1800 0 0.0250",
+        }
+        for support_name, expected_origin in supports.items():
+            link_name = "{}_link".format(support_name)
+            link = self.diff_robot.find("./link[@name='{}']".format(link_name))
+            self.assertIsNotNone(link, link_name)
+            self.assertIsNone(link.find("visual"), link_name)
+
+            sphere = link.find("./collision[@name='support_collision']/geometry/sphere")
+            self.assertIsNotNone(sphere, link_name)
+            self.assertEqual("0.0250", sphere.attrib["radius"])
+
+            joint = self.diff_robot.find("./joint[@name='{}_joint']".format(support_name))
+            self.assertIsNotNone(joint, support_name)
+            self.assertEqual("fixed", joint.attrib["type"])
+            self.assertEqual("base_link", joint.find("parent").attrib["link"])
+            self.assertEqual(link_name, joint.find("child").attrib["link"])
+            self.assertEqual(expected_origin, joint.find("origin").attrib["xyz"])
+
+            gazebo = self.diff_robot.find("./gazebo[@reference='{}']".format(link_name))
+            self.assertIsNotNone(gazebo, link_name)
+            self.assertEqual("0.02", gazebo.findtext("mu1"))
+            self.assertEqual("0.02", gazebo.findtext("mu2"))
+
     def test_diff_navigation_package_files_and_dependencies_exist(self):
         required_files = (
             "package.xml",
