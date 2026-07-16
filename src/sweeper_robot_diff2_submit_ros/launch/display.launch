@@ -1,0 +1,7 @@
+<launch>
+  <arg name="rviz" default="true"/>
+  <param name="robot_description" textfile="$(find sweeper_robot_diff2_submit_ros)/urdf/sweeper_robot_diff2_submit.urdf"/>
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen"/>
+  <node pkg="sweeper_robot_diff2_submit_ros" type="diff_drive_velocity_interface.py" name="diff_drive_velocity_interface" output="screen"/>
+  <node if="$(arg rviz)" pkg="rviz" type="rviz" name="rviz" args="-d $(find sweeper_robot_diff2_submit_ros)/rviz/display.rviz"/>
+</launch>

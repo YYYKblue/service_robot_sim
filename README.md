@@ -49,6 +49,14 @@ service_robot/
 │   │       ├── run_task_tests.py
 │   │       ├── run_voice_tasks.py
 │   │       └── save_map.sh
+│   ├── service_robot_diff_navigation/
+│   │   ├── launch/
+│   │   │   ├── diff_sim.launch
+│   │   │   ├── navigation.launch
+│   │   │   └── diff_navigation.launch
+│   │   ├── config/              # 与全向轮一致，仅保留差速必需参数差异
+│   │   ├── maps/                # indoor 地图的严格副本
+│   │   └── scripts/run_task_tests.py
 │   ├── voice_keyword_extractor/
 │   │   ├── launch/
 │   │   │   └── voice_keyword.launch
@@ -56,10 +64,12 @@ service_robot/
 │   │   │   └── keyword_service_node.py
 │   │   └── srv/
 │   │       └── ExtractKeyword.srv
-│   └── sweeper_robot_omni4_base_ros/
+│   ├── sweeper_robot_omni4_base_ros/
 │       ├── urdf/
 │       │   └── sweeper_robot_omni4_base.urdf
 │       └── meshes/
+│   └── sweeper_robot_diff2_submit_ros/
+│       └── urdf/sweeper_robot_diff2_submit.urdf
 └── tests/
     ├── test_robot_optimization_config.py
     ├── test_task_test_runner_config.py
@@ -77,9 +87,11 @@ service_robot/
 - `src/service_robot_navigation/config/task_tests.yaml`：五项顺序任务及其完整位姿 waypoint。
 - `src/service_robot_navigation/maps/`：生成后的地图文件。
 - `src/service_robot_navigation/scripts/run_task_tests.py`：顺序任务测试 runner；`run_voice_tasks.py`：语音命令任务 runner；`save_map.sh`：地图保存辅助脚本。
+- `src/service_robot_diff_navigation/`：差速轮对比导航包；复用相同地图、任务点和主要导航参数，只关闭横向 DWA 速度并使用差速 AMCL 模型。
 - `src/voice_keyword_extractor/`：语音录音、ASR 转写和任务关键词提取功能包，提供 `/extract_keyword` 服务。
 - `src/sweeper_robot_omni4_base_ros/urdf/sweeper_robot_omni4_base.urdf` 与 `src/sweeper_robot_omni4_base_ros/meshes/`：机器人模型和网格资源。
-- `tests/` 下三个文件：覆盖模型/导航配置、任务 runner 配置和 world 几何的 Windows 本地静态回归。
+- `src/sweeper_robot_diff2_submit_ros/urdf/sweeper_robot_diff2_submit.urdf`：外观与全向轮底盘统一、运动学保持差速的模型。
+- `tests/`：覆盖两套模型、导航配置、任务 runner 和 world 几何的 Windows 本地静态回归。
 
 ## 2. Ubuntu 构建与运行
 
@@ -192,6 +204,20 @@ rosservice call /extract_keyword \
 ```
 
 如果需要系统化排查语音配置，先看 `docs/ubuntu_voice_config_self_check.md`。
+
+### 2.2 差速轮对比导航
+
+全向轮和差速轮使用相同的 indoor world、地图、出生位姿和五项任务。两套仿真不能同时启动，因为都使用 `/cmd_vel`、`/odom`、`/scan` 和相同的 TF 名称。
+
+```bash
+# 终端 1：差速 Gazebo、AMCL、move_base
+roslaunch service_robot_diff_navigation diff_navigation.launch
+
+# 终端 2：运行与全向轮完全相同的五项任务
+python3 src/service_robot_diff_navigation/scripts/run_task_tests.py
+```
+
+差速轮车头定义为 `+X`，左右轮位于 `y=±0.198 m`，不支持 `linear.y`。同一点位下的失败结果应保留为底盘运动学对比证据，不通过修改 waypoint 消除差异。
 
 ## 3. 已完成的优化
 

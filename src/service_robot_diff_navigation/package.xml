@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>service_robot_diff_navigation</name>
+  <version>0.1.0</version>
+  <description>Indoor Gazebo navigation and ordered task runner for the differential-drive service robot.</description>
+
+  <maintainer email="maintainer@example.com">maintainer</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>rospy</depend>
+  <depend>actionlib</depend>
+  <depend>actionlib_msgs</depend>
+  <depend>move_base_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>std_srvs</depend>
+  <depend>python3-yaml</depend>
+  <depend>roslaunch</depend>
+  <depend>gazebo_ros</depend>
+  <depend>robot_state_publisher</depend>
+  <depend>map_server</depend>
+  <depend>amcl</depend>
+  <depend>move_base</depend>
+  <depend>dwa_local_planner</depend>
+  <depend>global_planner</depend>
+  <depend>rviz</depend>
+  <depend>my_world</depend>
+  <depend>sweeper_robot_diff2_submit_ros</depend>
+</package>

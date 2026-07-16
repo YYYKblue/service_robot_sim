@@ -1,0 +1,39 @@
+<launch>
+  <arg name="world" default="$(find my_world)/worlds/indoor.world" />
+  <arg name="paused" default="false" />
+  <arg name="use_sim_time" default="true" />
+  <arg name="gui" default="true" />
+  <arg name="headless" default="false" />
+  <arg name="debug" default="false" />
+
+  <arg name="model_name" default="sweeper_robot_diff2_submit" />
+  <arg name="x" default="2.0" />
+  <arg name="y" default="8.05" />
+  <arg name="z" default="0.01" />
+  <arg name="yaw" default="1.5708" />
+
+  <param name="use_sim_time" value="$(arg use_sim_time)" />
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(arg world)" />
+    <arg name="paused" value="$(arg paused)" />
+    <arg name="use_sim_time" value="$(arg use_sim_time)" />
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="headless" value="$(arg headless)" />
+    <arg name="debug" value="$(arg debug)" />
+  </include>
+
+  <param name="robot_description"
+         textfile="$(find sweeper_robot_diff2_submit_ros)/urdf/sweeper_robot_diff2_submit.urdf" />
+
+  <node pkg="robot_state_publisher"
+        type="robot_state_publisher"
+        name="robot_state_publisher"
+        output="screen" />
+
+  <node pkg="gazebo_ros"
+        type="spawn_model"
+        name="spawn_sweeper_robot_diff"
+        output="screen"
+        args="-urdf -param robot_description -model $(arg model_name) -x $(arg x) -y $(arg y) -z $(arg z) -Y $(arg yaw)" />
+</launch>

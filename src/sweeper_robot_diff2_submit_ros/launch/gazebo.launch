@@ -1,0 +1,15 @@
+<launch>
+  <arg name="paused" default="false"/>
+  <arg name="gui" default="true"/>
+  <arg name="world" default="$(find sweeper_robot_diff2_submit_ros)/worlds/diff2_demo.world"/>
+  <param name="use_sim_time" value="true"/>
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(arg world)"/>
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="gui" value="$(arg gui)"/>
+  </include>
+  <param name="robot_description" textfile="$(find sweeper_robot_diff2_submit_ros)/urdf/sweeper_robot_diff2_submit.urdf"/>
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen"/>
+  <node pkg="gazebo_ros" type="spawn_model" name="spawn_sweeper_robot" output="screen"
+        args="-urdf -param robot_description -model sweeper_robot_diff2_submit -x 0 -y 0 -z 0.01"/>
+</launch>

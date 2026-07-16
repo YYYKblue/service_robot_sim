@@ -1,0 +1,15 @@
+robot_type: two_differential_wheel_sweeper
+command_topic: "/cmd_vel"
+odom_topic: "/odom"
+scan_topic: "/scan"
+base_frame: "base_footprint"
+body_frame: "base_link"
+lidar_frame: "lidar_link"
+base_diameter_m: 0.500
+base_thickness_m: 0.100
+wheel_radius_m: 0.068
+wheel_separation_m: 0.396
+supported_velocity:
+  linear_x: true
+  linear_y: false
+  angular_z: true

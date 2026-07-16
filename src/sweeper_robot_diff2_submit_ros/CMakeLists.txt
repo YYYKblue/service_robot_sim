@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.0.2)
+project(sweeper_robot_diff2_submit_ros)
+find_package(catkin REQUIRED COMPONENTS rospy geometry_msgs sensor_msgs robot_state_publisher gazebo_ros)
+catkin_package()
+catkin_install_python(PROGRAMS scripts/diff_drive_velocity_interface.py DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+install(DIRECTORY launch rviz urdf scripts config worlds meshes docs DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})

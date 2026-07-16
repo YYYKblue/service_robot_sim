@@ -1,0 +1,27 @@
+<launch>
+  <arg name="map_file" default="$(find service_robot_diff_navigation)/maps/indoor.yaml" />
+  <arg name="rviz" default="true" />
+
+  <node pkg="map_server" type="map_server" name="map_server" output="screen"
+        args="$(arg map_file)" />
+
+  <node pkg="amcl" type="amcl" name="amcl" output="screen" clear_params="true">
+    <remap from="scan" to="/scan" />
+    <rosparam command="load" file="$(find service_robot_diff_navigation)/config/amcl_params.yaml" />
+  </node>
+
+  <node pkg="move_base" type="move_base" name="move_base" output="screen" clear_params="true">
+    <rosparam command="load" file="$(find service_robot_diff_navigation)/config/move_base_params.yaml" />
+    <rosparam command="load" file="$(find service_robot_diff_navigation)/config/global_planner_params.yaml" />
+    <rosparam command="load" file="$(find service_robot_diff_navigation)/config/dwa_local_planner_params.yaml" />
+
+    <rosparam command="load" file="$(find service_robot_diff_navigation)/config/costmap_common_params.yaml" ns="global_costmap" />
+    <rosparam command="load" file="$(find service_robot_diff_navigation)/config/global_costmap_params.yaml" ns="global_costmap" />
+
+    <rosparam command="load" file="$(find service_robot_diff_navigation)/config/costmap_common_params.yaml" ns="local_costmap" />
+    <rosparam command="load" file="$(find service_robot_diff_navigation)/config/local_costmap_params.yaml" ns="local_costmap" />
+  </node>
+
+  <node if="$(arg rviz)" pkg="rviz" type="rviz" name="rviz_diff_navigation"
+        args="-d $(find service_robot_diff_navigation)/rviz/navigation.rviz" />
+</launch>

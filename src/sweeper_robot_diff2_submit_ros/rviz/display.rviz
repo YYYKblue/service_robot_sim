@@ -1,0 +1,41 @@
+Panels:
+  - Class: rviz/Displays
+    Name: Displays
+Visualization Manager:
+  Displays:
+    - Alpha: 0.5
+      Cell Size: 0.05
+      Class: rviz/Grid
+      Color: 160; 160; 164
+      Enabled: true
+      Name: Grid
+      Plane: XY
+      Reference Frame: base_footprint
+    - Alpha: 1
+      Class: rviz/RobotModel
+      Collision Enabled: false
+      Enabled: true
+      Name: RobotModel
+      Robot Description: robot_description
+      Visual Enabled: true
+  Global Options:
+    Background Color: 248; 248; 248
+    Fixed Frame: base_footprint
+    Frame Rate: 30
+  Tools:
+    - Class: rviz/Interact
+    - Class: rviz/MoveCamera
+    - Class: rviz/Select
+  Views:
+    Current:
+      Class: rviz/Orbit
+      Distance: 0.80
+      Focal Point: {X: 0, Y: 0, Z: 0.10}
+      Pitch: 0.36
+      Target Frame: base_footprint
+      Yaw: 0.82
+Window Geometry:
+  Height: 850
+  Width: 1150
+  X: 60
+  Y: 40
